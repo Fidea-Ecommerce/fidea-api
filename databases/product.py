@@ -50,13 +50,13 @@ class ProductCRUD(Database):
         raise UserNotFoundError
 
     async def delete(self, category, **kwargs):
-        username = kwargs.get("username")
+        seller_id = kwargs.get("seller_id")
         id = kwargs.get("id")
         if category == "product":
             if product := (
                 ProductDatabase.query.filter(
                     and_(
-                        func.lower(ProductDatabase.username) == username.lower(),
+                        ProductDatabase.seller_id == seller_id,
                         ProductDatabase.id == id,
                     )
                 )
@@ -70,13 +70,20 @@ class ProductCRUD(Database):
                 raise ProductFoundError
 
     async def get(self, category, **kwargs):
-        username = kwargs.get("username")
+        seller_id = kwargs.get("seller_id")
+        seller = kwargs.get("seller")
         product_id = kwargs.get("product_id")
         title = kwargs.get("title")
         if category == "product":
             if product := (
-                ProductDatabase.query.filter(
-                    func.lower(ProductDatabase.username) == username.lower()
+                db_session.query(ProductDatabase, StoreDatabase)
+                .select_from(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
+                    and_(
+                        ProductDatabase.seller_id == seller_id,
+                        StoreDatabase.seller == seller,
+                    )
                 )
                 .order_by(desc(ProductDatabase.created_at))
                 .all()
@@ -86,9 +93,13 @@ class ProductCRUD(Database):
                 raise ProductFoundError
         elif category == "product_id":
             if product := (
-                ProductDatabase.query.filter(
+                db_session.query(ProductDatabase, StoreDatabase)
+                .select_from(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
                     and_(
-                        func.lower(ProductDatabase.username) == username.lower(),
+                        ProductDatabase.seller_id == seller_id,
+                        StoreDatabase.seller == seller,
                         ProductDatabase.id == product_id,
                     )
                 )
@@ -99,12 +110,10 @@ class ProductCRUD(Database):
             raise ProductFoundError
         elif category == "title":
             if product := (
-                ProductDatabase.query.filter(
-                    and_(
-                        func.lower(ProductDatabase.username) == username.lower(),
-                        ProductDatabase.title.ilike(f"%{title}%"),
-                    )
-                )
+                db_session.query(ProductDatabase, StoreDatabase)
+                .select_from(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(ProductDatabase.title.ilike(f"%{title}%"))
                 .order_by(desc(ProductDatabase.created_at))
                 .all()
             ):
