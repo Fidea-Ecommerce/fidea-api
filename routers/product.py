@@ -130,7 +130,7 @@ async def get_product_id(seller, seller_id, product_id, user_id):
         data = await product_database.get(
             "product_id", seller=seller, seller_id=seller_id, product_id=product_id
         )
-    except databases.product.ProductFoundError:
+    except ProductFoundError:
         return (
             jsonify(
                 {
@@ -178,7 +178,7 @@ async def get_product_id(seller, seller_id, product_id, user_id):
 async def get_title(title, user_id):
     try:
         data = await product_database.get("title", title=title)
-    except databases.product.ProductFoundError:
+    except ProductFoundError:
         return (
             jsonify(
                 {
@@ -195,6 +195,56 @@ async def get_title(title, user_id):
                 {
                     "status_code": 200,
                     "message": f"data product {title} found",
+                    "result": [
+                        {
+                            "product_id": product.id,
+                            "store": store.seller,
+                            "store_id": store.id,
+                            "recomendation": product.recomendation,
+                            "title": product.title,
+                            "description": product.description,
+                            "stock": product.stock,
+                            "price": product.price,
+                            "tags": product.tags,
+                            "is_favorite": await favorite_database.get(
+                                "is_favorite",
+                                user_id=user_id,
+                                seller_id=store.id,
+                                product_id=product.id,
+                            ),
+                            "image_url": product.image_url,
+                            "updated_at": product.updated_at,
+                            "created_at": product.created_at,
+                        }
+                        for product, store in data
+                    ],
+                }
+            ),
+            200,
+        )
+
+
+@product_router.get("/fidea/v1/product/<int:user_id>")
+async def get_product(user_id):
+    try:
+        data = await product_database.get("all")
+    except ProductFoundError:
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "message": f"data product not found",
+                    "result": None,
+                }
+            ),
+            404,
+        )
+    else:
+        return (
+            jsonify(
+                {
+                    "status_code": 200,
+                    "message": f"data product found",
                     "result": [
                         {
                             "product_id": product.id,
