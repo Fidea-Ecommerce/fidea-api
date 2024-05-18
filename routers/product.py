@@ -1,6 +1,5 @@
 from flask import Blueprint, request, jsonify
 from databases import ProductCRUD, FavoriteCRUD
-import databases
 from utils import UserNotFoundError, UserNotSeller, token_required, ProductFoundError
 from sqlalchemy.exc import IntegrityError
 
