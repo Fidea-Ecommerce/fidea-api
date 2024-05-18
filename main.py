@@ -24,7 +24,18 @@ limiter = Limiter(
     get_remote_address, app=app, default_limits=[""], storage_uri="memory://"
 )
 
-
+limiter.limit("20/minute")(product_router)
+limiter.limit("20/minute")(user_router)
+limiter.limit("20/minute")(cart_router)
+limiter.limit("20/minute")(checkout_router)
+limiter.limit("20/minute")(reset_password_router)
+limiter.limit("20/minute")(account_active_router)
+limiter.limit("20/minute")(email_router)
+limiter.limit("20/minute")(login_router)
+limiter.limit("20/minute")(register_router)
+limiter.limit("20/minute")(wallet_router)
+limiter.limit("20/minute")(store_router)
+limiter.limit("20/minute")(favorite_router)
 app.register_blueprint(product_router)
 app.register_blueprint(user_router)
 app.register_blueprint(cart_router)
@@ -47,7 +58,9 @@ app.register_error_handler(400, handle_400)
 async def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Headers"] = (
+        "Content-Type, Authorization, X-Forwarded-For, User-Agent"
+    )
     return response
 
 

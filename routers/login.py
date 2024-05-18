@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_bcrypt import Bcrypt
 from databases import UserCRUD, StoreCRUD
 from utils import UserNotFoundError
@@ -14,6 +14,8 @@ seller_database = StoreCRUD()
 
 @login_router.get("/fidea/v1/user/login/<string:email>/<string:password>")
 async def login(email, password):
+    user_ip = request.headers.get("X-Forwarded-For") or request.remote_addr
+    user_agent_string = request.headers.get("User-Agent")
     try:
         user = await user_database.get("login", email=email, password=password)
     except UserNotFoundError:
