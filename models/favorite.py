@@ -54,6 +54,7 @@ favorite_table = Table(
         Integer,
         ForeignKey("product.id", ondelete="CASCADE"),
         nullable=False,
+        unique=True,
     ),
     Column("created_at", Float, nullable=False),
     Column("updated_at", Float, nullable=False),
