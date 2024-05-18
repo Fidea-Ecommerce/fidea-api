@@ -31,7 +31,7 @@ async def login(email, password):
     else:
         if bcrypt.check_password_hash(user.password, password):
             expired_at = datetime.datetime.now(datetime.timezone.utc).timestamp() + (
-                datetime.timedelta(hours=3).total_seconds()
+                datetime.timedelta(minutes=15).total_seconds()
             )
             is_seller = await seller_database.get("is_seller", user_id=user.id)
             encoded_jwt = jwt.encode(
