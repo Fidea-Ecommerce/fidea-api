@@ -18,12 +18,10 @@ class StoreCRUD(Database):
             .order_by(desc(UserDatabase.created_at))
             .first()
         ):
-            if user.is_active:
-                store = StoreDatabase(user.id, seller, created_at, created_at)
-                db_session.add(store)
-                db_session.commit()
-                return
-            raise UserNotIsActive
+            store = StoreDatabase(user.id, seller, created_at, created_at)
+            db_session.add(store)
+            db_session.commit()
+            return
         raise UserNotFoundError
 
     async def get(self, category, **kwargs):
