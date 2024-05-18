@@ -33,9 +33,6 @@ async def login():
         )
     else:
         if bcrypt.check_password_hash(user.password, password):
-            expired_at = datetime.datetime.now(datetime.timezone.utc).timestamp() + (
-                datetime.timedelta(minutes=15).total_seconds()
-            )
             is_seller = await seller_database.get("is_seller", user_id=user.id)
             access_token = jwt.encode(
                 {
@@ -45,7 +42,8 @@ async def login():
                     "is_active": user.is_active,
                     "is_admin": user.is_admin,
                     "is_seller": True if is_seller else False,
-                    "exp": expired_at,
+                    "exp": datetime.datetime.now(datetime.timezone.utc).timestamp()
+                    + datetime.timedelta(minutes=5).total_seconds(),
                 },
                 access_token_key,
                 algorithm=algorithm,
@@ -55,7 +53,8 @@ async def login():
                     "user_id": user.id,
                     "username": user.username,
                     "email": user.email,
-                    "exp": expired_at,
+                    "exp": datetime.datetime.now(datetime.timezone.utc).timestamp()
+                    + datetime.timedelta(days=30).total_seconds(),
                 },
                 refresh_token_key,
                 algorithm=algorithm,
