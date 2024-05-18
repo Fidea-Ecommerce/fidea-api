@@ -72,7 +72,7 @@ async def add_product():
 
 
 @product_router.get("/fidea/v1/product/<string:seller>/<int:seller_id>/<int:user_id>")
-async def get_product(seller, seller_id, user_id):
+async def get_product_by_seller(seller, seller_id, user_id):
     try:
         data = await product_database.get("product", seller=seller, seller_id=seller_id)
     except ProductFoundError:
@@ -103,6 +103,7 @@ async def get_product(seller, seller_id, user_id):
                             "stock": product.stock,
                             "price": product.price,
                             "tags": product.tags,
+                            "sold": product.sold,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
                                 user_id=user_id,
@@ -157,6 +158,7 @@ async def get_product_id(seller, seller_id, product_id, user_id):
                         "stock": product.stock,
                         "price": product.price,
                         "tags": product.tags,
+                        "sold": product.sold,
                         "is_favorite": await favorite_database.get(
                             "is_favorite",
                             user_id=user_id,
@@ -205,6 +207,7 @@ async def get_title(title, user_id):
                             "stock": product.stock,
                             "price": product.price,
                             "tags": product.tags,
+                            "sold": product.sold,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
                                 user_id=user_id,
@@ -255,6 +258,7 @@ async def get_product(user_id):
                             "stock": product.stock,
                             "price": product.price,
                             "tags": product.tags,
+                            "sold": product.sold,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
                                 user_id=user_id,

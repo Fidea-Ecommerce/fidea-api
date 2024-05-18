@@ -40,7 +40,7 @@ async def checkout_product():
             cart, user, product, store = item
             await cart_database.delete(user_id=cart.user_id, cart_id=cart.id)
             await product_database.update(
-                "amount",
+                "checkout",
                 seller_id=product.seller_id,
                 product_id=product.id,
                 amount=(

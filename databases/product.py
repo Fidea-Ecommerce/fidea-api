@@ -1,7 +1,7 @@
 from .config import db_session, init_db
-from models import ProductDatabase, StoreDatabase, UserDatabase, FavoriteDatabase
+from models import ProductDatabase, StoreDatabase, UserDatabase
 from .database import Database
-from sqlalchemy import func, and_, desc
+from sqlalchemy import and_, desc
 from utils import UserNotFoundError, ProductFoundError, UserNotIsActive
 import datetime
 
@@ -135,7 +135,7 @@ class ProductCRUD(Database):
         seller_id = kwargs.get("seller_id")
         product_id = kwargs.get("product_id")
         amount = kwargs.get("amount")
-        if category == "stock":
+        if category == "checkout":
             if product := (
                 ProductDatabase.query.filter(
                     and_(
@@ -148,6 +148,10 @@ class ProductCRUD(Database):
             ):
                 for p in product:
                     p.stock = amount
+                    p.sold += amount
+                    p.updated_at = datetime.datetime.now(
+                        datetime.timezone.utc
+                    ).timestamp()
                 db_session.commit()
             else:
                 raise ProductFoundError
