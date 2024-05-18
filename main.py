@@ -16,6 +16,7 @@ from routers.login import login_router
 from routers.register import register_router
 from routers.wallet import wallet_router
 from routers.store import store_router
+from routers.favorite import favorite_router
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -35,6 +36,7 @@ app.register_blueprint(login_router)
 app.register_blueprint(register_router)
 app.register_blueprint(wallet_router)
 app.register_blueprint(store_router)
+app.register_blueprint(favorite_router)
 app.register_error_handler(429, handle_429)
 app.register_error_handler(404, handle_404)
 app.register_error_handler(415, handle_415)
