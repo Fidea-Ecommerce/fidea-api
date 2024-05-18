@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, abort
 import jwt
 from config import jwt_key, algorithm
 
@@ -12,35 +12,26 @@ def token_required():
             try:
                 token = authorization_header["Authorization"].split(" ")[1]
             except:
-                return (
-                    jsonify({"message": "Authorization header is missing or invalid"}),
-                    401,
-                )
+                abort(401)
             try:
-                user = jwt.decode(token, jwt_key, algorithms=[algorithm])
+                user_decoded = jwt.decode(token, jwt_key, algorithms=[algorithm])
             except jwt.exceptions.DecodeError:
-                return (
-                    jsonify({"message": "Authorization token is invalid"}),
-                    401,
-                )
+                abort(401)
             except jwt.exceptions.ExpiredSignatureError:
-                    return (
-                        jsonify({"message": "Authorization Invalid"}),
-                        401,
-                    )
+                abort(401)
             else:
                 from databases import UserCRUD
 
                 user_database = UserCRUD()
                 try:
-                    await user_database.get("login", email=user["email"])
+                    user = await user_database.get("login", email=user_decoded["email"])
                 except:
-                    return (
-                        jsonify({"message": "Authorization Invalid"}),
-                        401,
-                    )
+                    abort(401)
                 else:
-                    return await f(*args, **kwargs)
+                    if user.is_active:
+                        return await f(*args, **kwargs)
+                    else:
+                        abort(403)
 
         return __token_required
 

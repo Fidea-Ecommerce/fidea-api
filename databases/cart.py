@@ -58,8 +58,6 @@ class CartCRUD(Database):
                 .order_by(desc(ProductDatabase.created_at))
                 .first()
             ):
-                if not data_user.is_active:
-                    raise UserNotIsActive
                 if product_data.stock < amount:
                     raise StockNotAvaible
                 product_result = CartDatabase(

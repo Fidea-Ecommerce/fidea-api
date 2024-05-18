@@ -18,8 +18,6 @@ class WalletCRUD(Database):
             .order_by(desc(UserDatabase.created_at))
             .first()
         ):
-            if not user.is_active:
-                raise UserNotIsActive
             user = WalletDatabase(user_id, created_at, created_at)
             db_session.add(user)
             db_session.commit()
