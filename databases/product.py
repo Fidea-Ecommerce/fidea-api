@@ -1,5 +1,5 @@
 from .config import db_session, init_db
-from models import ProductDatabase, StoreDatabase, UserDatabase
+from models import ProductDatabase, StoreDatabase, UserDatabase, FavoriteDatabase
 from .database import Database
 from sqlalchemy import func, and_, desc
 from utils import UserNotFoundError, ProductFoundError, UserNotIsActive
@@ -74,6 +74,7 @@ class ProductCRUD(Database):
         seller = kwargs.get("seller")
         product_id = kwargs.get("product_id")
         title = kwargs.get("title")
+        user_id = kwargs.get("user_id")
         if category == "product":
             if product := (
                 db_session.query(ProductDatabase, StoreDatabase)
