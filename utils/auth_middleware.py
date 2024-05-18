@@ -29,6 +29,12 @@ def token_required():
                 except:
                     abort(401)
                 else:
+                    if (
+                        user.is_active
+                        and user.unbanned_at == None
+                        and user.banned_at == None
+                    ):
+                        return await f(*args, **kwargs)
                     if not user.is_active and user.unbanned_at:
                         if (
                             user.unbanned_at
@@ -39,8 +45,6 @@ def token_required():
                             await user_database.update(
                                 "unbanned", unbanned_at=None, email=user.email
                             )
-                    else:
-                        abort(403)
                     return await f(*args, **kwargs)
 
         return __token_required
