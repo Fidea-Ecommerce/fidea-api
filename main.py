@@ -4,7 +4,15 @@ from config import debug_mode
 from databases import db_session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from utils import handle_404, handle_415, handle_429, handle_400, handle_401, handle_403
+from utils import (
+    handle_404,
+    handle_415,
+    handle_429,
+    handle_400,
+    handle_401,
+    handle_403,
+    handle_405,
+)
 from routers.account_active import account_active_router
 from routers.reset_password import reset_password_router
 from routers.email import email_router
@@ -54,6 +62,7 @@ app.register_error_handler(415, handle_415)
 app.register_error_handler(400, handle_400)
 app.register_error_handler(401, handle_401)
 app.register_error_handler(403, handle_403)
+app.register_error_handler(405, handle_405)
 
 
 @app.after_request
