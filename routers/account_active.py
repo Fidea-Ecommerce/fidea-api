@@ -59,16 +59,6 @@ async def account_active(token):
 async def account_active_email():
     data = request.json
     email = data.get("email")
-    if email_required := email.isspace() or not email:
-        return (
-            jsonify(
-                {
-                    "status_code": 400,
-                    "message": f"email is required",
-                }
-            ),
-            400,
-        )
     try:
         user = await user_database.get("email", email=email)
     except UserNotFoundError:
@@ -94,7 +84,7 @@ async def account_active_email():
             )
         created_at = datetime.datetime.now(datetime.timezone.utc).timestamp()
         expired_at = created_at + (datetime.timedelta(hours=7).total_seconds())
-        token = await AccountActive.insert(user.id, email, created_at, expired_at)
+        token = await AccountActive.insert(user.id, email)
         try:
             await account_active_database.insert(
                 user.id,

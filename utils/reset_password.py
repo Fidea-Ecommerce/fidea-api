@@ -5,7 +5,7 @@ from config import reset_password_key
 
 class TokenResetPassword(Token):
     @staticmethod
-    async def insert(user_id, email, created_at, expired_at):
+    async def insert(user_id, email):
         s = URLSafeSerializer(reset_password_key, salt="reset_password")
         token = s.dumps({"user_id": user_id, "email": email})
         return token
@@ -16,8 +16,6 @@ class TokenResetPassword(Token):
         try:
             s.loads(token)["user_id"]
             s.loads(token)["email"]
-            s.loads(token)["created_at"]
-            s.loads(token)["expired_at"]
         except:
             return None
         else:
