@@ -45,7 +45,8 @@ def token_required():
                             await user_database.update(
                                 "unbanned", unbanned_at=None, email=user.email
                             )
-                    return await f(*args, **kwargs)
+                        return await f(*args, **kwargs)
+                    abort(403)
 
         return __token_required
 
