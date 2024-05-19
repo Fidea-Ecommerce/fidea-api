@@ -13,7 +13,7 @@ class ProductCRUD(Database):
 
     async def insert(
         self,
-        user_id,
+        seller_id,
         description,
         title,
         price,
@@ -26,7 +26,7 @@ class ProductCRUD(Database):
             data := db_session.query(StoreDatabase, UserDatabase)
             .select_from(StoreDatabase)
             .join(UserDatabase)
-            .filter(StoreDatabase.id == user_id)
+            .filter(StoreDatabase.id == seller_id)
             .order_by(desc(StoreDatabase.created_at))
             .first()
         ):
@@ -34,7 +34,7 @@ class ProductCRUD(Database):
             if not store.is_active:
                 raise UserNotIsActive
             product = ProductDatabase(
-                user_id,
+                seller_id,
                 description,
                 title,
                 price,
