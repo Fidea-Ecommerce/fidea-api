@@ -1,6 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from config import debug_mode
+from config import debug_mode, database_limiter_url
 from databases import db_session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -30,7 +30,11 @@ from routers.refresh_token import refresh_token_router
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 limiter = Limiter(
-    get_remote_address, app=app, default_limits=[""], storage_uri="memory://"
+    get_remote_address,
+    app=app,
+    default_limits=[""],
+    storage_uri=database_limiter_url,
+    strategy="fixed-window",
 )
 
 limiter.limit("20/minute")(product_router)

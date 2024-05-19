@@ -3,7 +3,8 @@ import os
 
 load_dotenv()
 
-database_url = os.environ.get("DB_URL")
+database_fidea_url = os.environ.get("DATABASE_FIDEA_URL")
+database_limiter_url = os.environ.get("DATABASE_LIMITER_URL")
 debug_mode = os.environ.get("DEBUG_MODE")
 access_token_key = os.environ.get("ACCESS_TOKEN_KEY")
 refresh_token_key = os.environ.get("REFRESH_TOKEN_KEY")
