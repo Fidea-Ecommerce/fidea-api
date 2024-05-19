@@ -23,3 +23,7 @@ async def handle_401(error):
 
 async def handle_403(error):
     return jsonify({"message": "user invalid", "status_code": 401}), 401
+
+
+async def handle_405(error):
+    return jsonify({"message": "method not allowed", "status_code": 405}), 405

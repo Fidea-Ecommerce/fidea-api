@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import request, jsonify, abort
 import jwt
-from config import jwt_key, algorithm
+from config import access_token_key, algorithm
 import datetime
 
 
@@ -15,7 +15,9 @@ def token_required():
             except:
                 abort(401)
             try:
-                user_decoded = jwt.decode(token, jwt_key, algorithms=[algorithm])
+                user_decoded = jwt.decode(
+                    token, access_token_key, algorithms=[algorithm]
+                )
             except jwt.exceptions.DecodeError:
                 abort(401)
             except jwt.exceptions.ExpiredSignatureError:
