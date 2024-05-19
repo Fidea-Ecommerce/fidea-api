@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from utils import token_required, UserNotIsActive
+from utils import token_required
 from databases import WalletCRUD
 from sqlalchemy.exc import IntegrityError
 
@@ -19,17 +19,7 @@ async def active_wallet():
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"wallet {user_id} already active",
-                }
-            ),
-            400,
-        )
-    except UserNotIsActive:
-        return (
-            jsonify(
-                {
-                    "status_code": 400,
-                    "message": f"user {user_id} is not active",
+                    "message": f"wallet user '{user_id}' already active",
                 }
             ),
             400,
@@ -39,7 +29,7 @@ async def active_wallet():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success active wallet {user_id!r}",
+                    "message": f"success active wallet '{user_id}'",
                 }
             ),
             201,

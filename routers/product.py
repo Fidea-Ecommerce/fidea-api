@@ -12,7 +12,7 @@ favorite_database = FavoriteCRUD()
 @token_required()
 async def add_product():
     data = request.json
-    user_id = data.get("user_id")
+    seller_id = data.get("seller_id")
     title = data.get("title")
     description = data.get("description")
     price = data.get("price")
@@ -21,7 +21,7 @@ async def add_product():
     stock = data.get("stock")
     try:
         await product_database.insert(
-            user_id,
+            seller_id,
             description,
             title,
             price,
@@ -44,7 +44,7 @@ async def add_product():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"user {user_id!r} not found",
+                    "message": f"user {seller_id!r} not found",
                 }
             ),
             404,
@@ -54,7 +54,7 @@ async def add_product():
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"user {user_id!r} not seller",
+                    "message": f"user {seller_id!r} not seller",
                 }
             ),
             400,

@@ -3,7 +3,7 @@ from models import StoreDatabase, UserDatabase
 from sqlalchemy import and_, func, or_, desc
 from .database import Database
 import datetime
-from utils import UserNotIsActive, UserNotFoundError
+from utils import UserNotFoundError
 
 
 class StoreCRUD(Database):
@@ -26,12 +26,21 @@ class StoreCRUD(Database):
 
     async def get(self, category, **kwargs):
         user_id = kwargs.get("user_id")
+        seller_id = kwargs.get("seller_id")
         if category == "is_seller":
             return (
                 StoreDatabase.query.filter(StoreDatabase.user_id == user_id)
                 .order_by(desc(StoreDatabase.created_at))
                 .first()
             )
+        elif category == "seller_id":
+            if data := (
+                StoreDatabase.query.filter(StoreDatabase.id == seller_id)
+                .order_by(desc(StoreDatabase.created_at))
+                .first()
+            ):
+                return data
+            raise UserNotFoundError
 
     async def update(self, category, **kwargs):
         user_id = kwargs.get("user_id")
@@ -44,6 +53,8 @@ class StoreCRUD(Database):
             ):
                 user.amount += amount
                 db_session.commit()
+                return
+            raise UserNotFoundError
 
     async def delete(self):
         pass
