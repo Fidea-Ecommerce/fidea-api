@@ -335,7 +335,7 @@ async def add_cart():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"product {product_id} not found",
+                    "message": f"product '{product_id}' not found",
                 }
             ),
             404,
@@ -357,17 +357,7 @@ async def add_cart():
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"stock product {product_id} not avaible",
-                }
-            ),
-            400,
-        )
-    except UserNotIsActive:
-        return (
-            jsonify(
-                {
-                    "status_code": 400,
-                    "message": f"user {user_id} is not active",
+                    "message": f"stock product '{product_id}' not avaible",
                 }
             ),
             400,
@@ -377,7 +367,7 @@ async def add_cart():
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"user {user_id} not found",
+                    "message": f"user '{user_id}' not found",
                 }
             ),
             400,
@@ -387,7 +377,7 @@ async def add_cart():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success add product to {user_id} cart",
+                    "message": f"success add product to user '{user_id}' cart",
                 }
             ),
             201,
