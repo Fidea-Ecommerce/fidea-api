@@ -24,7 +24,7 @@ async def get_product(user_id):
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart {user_id!r} not found",
+                    "message": f"cart user '{user_id}' not found",
                     "result": None,
                 }
             ),
@@ -35,7 +35,7 @@ async def get_product(user_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"cart {user_id!r} was found",
+                    "message": f"cart user '{user_id}' was found",
                     "result": [
                         {
                             "store_id": store.id,
@@ -69,7 +69,7 @@ async def get_product_cart_id(user_id, cart_id):
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart {user_id!r} not found",
+                    "message": f"cart user '{user_id}' not found",
                     "result": None,
                 }
             ),
@@ -81,7 +81,7 @@ async def get_product_cart_id(user_id, cart_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"cart {user_id!r} was found",
+                    "message": f"cart user '{user_id}' was found",
                     "result": {
                         "store_id": store.id,
                         "cart_id": cart.id,
@@ -117,7 +117,7 @@ async def update_cart_tick():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"user {user_id} not found",
+                    "message": f"user '{user_id}' not found",
                 }
             ),
             404,
@@ -144,7 +144,7 @@ async def get_cart_checkout(user_id):
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart {user_id!r} not found",
+                    "message": f"cart user '{user_id}' not found",
                     "result": None,
                 }
             ),
@@ -176,7 +176,7 @@ async def get_cart_checkout(user_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"cart {user_id!r} was found",
+                    "message": f"cart user '{user_id}' was found",
                     "result": {"item": arr, "total_price": price},
                 }
             ),
@@ -314,7 +314,7 @@ async def delete_cart():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success delete cart to {user_id!r} cart",
+                    "message": f"success delete cart to user '{user_id}' cart",
                 }
             ),
             201,
