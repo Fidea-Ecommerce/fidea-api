@@ -3,6 +3,7 @@
 <ul>
     <li>Flask (Framework Python)</li>
     <li>PostgreSQL (Database SQL)</li>
+    <li>MongoDB (Database No SQL)</li>
     <li>Railway (Cloud Hosting)</li>
 </ul>
 <h2>Fiture</h2>
