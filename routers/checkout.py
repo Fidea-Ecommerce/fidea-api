@@ -24,7 +24,7 @@ async def checkout_product():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"user cart '{user_id}' not found",
+                    "message": f"cart user '{user_id}' not found",
                 }
             ),
             404,
