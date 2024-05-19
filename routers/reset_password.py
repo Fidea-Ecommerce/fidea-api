@@ -90,7 +90,7 @@ async def email_reset_password():
     else:
         created_at = datetime.datetime.now(datetime.timezone.utc).timestamp()
         expired_at = created_at + (datetime.timedelta(hours=7).total_seconds())
-        token = await TokenResetPassword.insert(user.id, email, created_at, expired_at)
+        token = await TokenResetPassword.insert(user.id, email)
         try:
             await token_database.insert(user.id, token, created_at, expired_at)
         except IntegrityError:

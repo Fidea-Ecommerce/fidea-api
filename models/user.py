@@ -28,6 +28,11 @@ user_table = Table(
     Column("password", String, nullable=False),
     Column("created_at", Float, nullable=False),
     Column("updated_at", Float, nullable=False),
+    Column(
+        "avatar_url",
+        String,
+        default="https://images-ext-1.discordapp.net/external/-lSg4fwfxBafHkIEYKTxSegjgwU_dH1QLzzth1Cumew/https/t4.ftcdn.net/jpg/02/15/84/43/360_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg?format=webp",
+    ),
     Column("is_active", Boolean, default=False),
     Column("banned_at", Float, default=None),
     Column("unbanned_at", Float, default=None),

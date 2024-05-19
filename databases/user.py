@@ -90,6 +90,7 @@ class UserCRUD(Database):
         balance = kwargs.get("balance")
         password = kwargs.get("password")
         new_password = kwargs.get("new_password")
+        unbanned_at = kwargs.get("unbanned_at")
         if category == "buy":
             if (
                 user := UserDatabase.query.filter(
@@ -132,6 +133,19 @@ class UserCRUD(Database):
                 .first()
             ):
                 user.password = new_password
+                user.update_at = datetime.datetime.now(
+                    datetime.timezone.utc
+                ).timestamp()
+                db_session.commit()
+            else:
+                raise UserNotFoundError
+        elif category == "unbanned":
+            if (
+                user := UserDatabase.query.filter(UserDatabase.email == email)
+                .order_by(desc(UserDatabase.created_at))
+                .first()
+            ):
+                user.unbanned_at = unbanned_at
                 user.update_at = datetime.datetime.now(
                     datetime.timezone.utc
                 ).timestamp()

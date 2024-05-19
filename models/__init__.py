@@ -5,3 +5,4 @@ from .account_active import *
 from .reset_password import *
 from .wallet import *
 from .store import *
+from .favorite import *

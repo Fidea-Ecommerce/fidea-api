@@ -62,12 +62,14 @@ product_table = Table(
     Column("stock", Integer, nullable=False),
     Column("created_at", Float, nullable=False),
     Column("updated_at", Float, nullable=False),
-    Column("recomendation", Boolean, default=False),
+    Column("recomendation", Boolean, default=False, nullable=False),
+    Column("sold", Integer, default=0, nullable=False),
     CheckConstraint("seller_id >= 0", name="positive_seller_id"),
     CheckConstraint("price >= 0", name="positive_price"),
     CheckConstraint("stock >= 0", name="positive_stock"),
     CheckConstraint("created_at >= 0", name="positive_created_at"),
     CheckConstraint("updated_at >= 0", name="positive_updated_at"),
+    CheckConstraint("sold >= 0", name="positive_sold"),
 )
 
 mapper_registry.map_imperatively(ProductDatabase, product_table)
