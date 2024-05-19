@@ -16,12 +16,19 @@ store_database = StoreCRUD()
 async def checkout_product():
     data = request.json
     user_id = data.get("user_id")
-    seller_id = data.get("seller_id")
     try:
         user_wallet = await wallet_database.get("user_id", user_id=user_id)
         user_cart = await cart_database.get("cart_checkout", user_id=user_id)
-    except:
-        pass
+    except (UserNotFoundError, ProductFoundError):
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "message": f"user cart '{user_id}' not found",
+                }
+            ),
+            404,
+        )
     else:
         price = sum(
             [cart.amount * product.price for cart, user, product, store in user_cart]
@@ -65,7 +72,7 @@ async def checkout_product():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success purchase to store {seller_id}",
+                    "message": f"success purchase from cart '{user_id}'",
                 }
             ),
             201,

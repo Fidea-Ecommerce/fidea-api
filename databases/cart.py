@@ -124,8 +124,7 @@ class CartCRUD(Database):
                 .all()
             ):
                 return cart_item
-            else:
-                raise ProductFoundError
+            raise ProductFoundError
         elif category == "cart_id":
             if (
                 cart_item := db_session.query(
