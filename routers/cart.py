@@ -127,7 +127,7 @@ async def update_cart_tick():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success update mark cart {user_id}",
+                    "message": f"success update mark cart user '{user_id}'",
                 }
             ),
             201,
@@ -197,7 +197,7 @@ async def put_cart_bill_tick():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart id {cart_id} not found",
+                    "message": f"cart id '{cart_id}' not found",
                 }
             ),
             404,
@@ -207,7 +207,7 @@ async def put_cart_bill_tick():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success update mark cart id {cart_id}",
+                    "message": f"success update mark cart id '{cart_id}'",
                 }
             ),
             201,
@@ -232,7 +232,7 @@ async def put_cart_amount():
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"stock cart {cart_id} not avaible",
+                    "message": f"stock cart '{cart_id}' not avaible",
                 }
             ),
             400,
@@ -252,7 +252,7 @@ async def put_cart_amount():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart {cart_id} not found",
+                    "message": f"cart '{cart_id}' not found",
                 }
             ),
             404,
@@ -272,7 +272,7 @@ async def put_cart_amount():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success update amount cart product {cart_id}",
+                    "message": f"success update amount cart product '{cart_id}'",
                 }
             ),
             201,
@@ -304,7 +304,7 @@ async def delete_cart():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart {cart_id} not found",
+                    "message": f"cart '{cart_id}' not found",
                 }
             ),
             404,
