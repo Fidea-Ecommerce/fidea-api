@@ -3,7 +3,7 @@ from models import FavoriteDatabase
 from sqlalchemy import and_, desc
 from .database import Database
 import datetime
-from utils import ProductFoundError
+from utils import ProductFoundError, ProductAlready
 
 
 class FavoriteCRUD(Database):
@@ -13,10 +13,22 @@ class FavoriteCRUD(Database):
 
     async def insert(self, user_id, seller_id, product_id):
         created_at = datetime.datetime.now(datetime.timezone.utc).timestamp()
-        reset_password = FavoriteDatabase(
+        if (
+            data := FavoriteDatabase.query.filter(
+                and_(
+                    FavoriteDatabase.user_id == user_id,
+                    FavoriteDatabase.seller_id == seller_id,
+                    FavoriteDatabase.product_id == product_id,
+                )
+            )
+            .order_by(desc(FavoriteDatabase.created_at))
+            .first()
+        ):
+            raise ProductAlready
+        favorite_item = FavoriteDatabase(
             user_id, seller_id, product_id, created_at, created_at
         )
-        db_session.add(reset_password)
+        db_session.add(favorite_item)
         db_session.commit()
 
     async def get(self, category, **kwargs):
