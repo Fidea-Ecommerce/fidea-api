@@ -135,6 +135,23 @@ class ProductCRUD(Database):
             ):
                 return product
             raise ProductFoundError
+        elif category == "title_product_seller":
+            if product := (
+                db_session.query(ProductDatabase, StoreDatabase)
+                .select_from(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
+                    and_(
+                        ProductDatabase.title.ilike(f"%{title}%"),
+                        ProductDatabase.seller_id == seller_id,
+                        StoreDatabase.seller == seller,
+                    )
+                )
+                .order_by(desc(ProductDatabase.created_at))
+                .all()
+            ):
+                return product
+            raise ProductFoundError
 
     async def update(self, category, **kwargs):
         seller_id = kwargs.get("seller_id")
