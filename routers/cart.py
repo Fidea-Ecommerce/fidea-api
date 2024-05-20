@@ -15,17 +15,18 @@ cart_database = CartCRUD()
 favorite_database = FavoriteCRUD()
 
 
-@cart_router.get("/fidea/v1/cart/<int:user_id>")
+@cart_router.get("/fidea/v1/cart")
 @token_required()
-async def get_product(user_id):
+async def get_product():
+    user = request.user
     try:
-        result = await cart_database.get("cart", user_id=user_id)
+        result = await cart_database.get("cart", user_id=user.id)
     except ProductFoundError:
         return (
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart user '{user_id}' not found",
+                    "message": f"cart user '{user.id}' not found",
                     "result": None,
                 }
             ),
@@ -36,7 +37,7 @@ async def get_product(user_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"cart user '{user_id}' was found",
+                    "message": f"cart user '{user.id}' was found",
                     "result": [
                         {
                             "product_id": product.id,
@@ -52,7 +53,7 @@ async def get_product(user_id):
                             "sold": product.sold,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
-                                user_id=user_id,
+                                user_id=user.id,
                                 seller_id=store.id,
                                 product_id=product.id,
                             ),
@@ -69,17 +70,18 @@ async def get_product(user_id):
         )
 
 
-@cart_router.get("/fidea/v1/cart/<int:user_id>/<int:cart_id>")
+@cart_router.get("/fidea/v1/cart/<int:cart_id>")
 @token_required()
-async def get_product_cart_id(user_id, cart_id):
+async def get_product_cart_id(cart_id):
+    user = request.user
     try:
-        result = await cart_database.get("cart_id", user_id=user_id, cart_id=cart_id)
+        result = await cart_database.get("cart_id", user_id=user.id, cart_id=cart_id)
     except ProductFoundError:
         return (
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart user '{user_id}' not found",
+                    "message": f"cart user '{user.id}' not found",
                     "result": None,
                 }
             ),
@@ -91,7 +93,7 @@ async def get_product_cart_id(user_id, cart_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"cart user '{user_id}' was found",
+                    "message": f"cart user '{user.id}' was found",
                     "result": {
                         "product_id": product.id,
                         "store_id": store.id,
@@ -106,7 +108,7 @@ async def get_product_cart_id(user_id, cart_id):
                         "sold": product.sold,
                         "is_favorite": await favorite_database.get(
                             "is_favorite",
-                            user_id=user_id,
+                            user_id=user.id,
                             seller_id=store.id,
                             product_id=product.id,
                         ),
@@ -125,10 +127,10 @@ async def get_product_cart_id(user_id, cart_id):
 @token_required()
 async def update_cart_tick():
     data = request.json
-    user_id = data.get("user_id")
     mark = data.get("mark")
+    user = request.user
     try:
-        await cart_database.update("all_tick", user_id=user_id, mark=mark)
+        await cart_database.update("all_tick", user_id=user.id, mark=mark)
     except (DataError, StatementError):
         abort(415)
     except ProductFoundError:
@@ -136,7 +138,7 @@ async def update_cart_tick():
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"user '{user_id}' not found",
+                    "message": f"user '{user.id}' not found",
                 }
             ),
             404,
@@ -146,24 +148,25 @@ async def update_cart_tick():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success update mark cart user '{user_id}'",
+                    "message": f"success update mark cart user '{user.id}'",
                 }
             ),
             201,
         )
 
 
-@cart_router.get("/fidea/v1/cart/checkout/<int:user_id>")
+@cart_router.get("/fidea/v1/cart/checkout")
 @token_required()
-async def get_cart_checkout(user_id):
+async def get_cart_checkout():
+    user = request.user
     try:
-        result = await cart_database.get("cart_checkout", user_id=user_id)
+        result = await cart_database.get("cart_checkout", user_id=user.id)
     except ProductFoundError:
         return (
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart user '{user_id}' not found",
+                    "message": f"cart user '{user.id}' not found",
                     "result": None,
                 }
             ),
@@ -189,7 +192,7 @@ async def get_cart_checkout(user_id):
                     "sold": product.sold,
                     "is_favorite": await favorite_database.get(
                         "is_favorite",
-                        user_id=user_id,
+                        user_id=user.id,
                         seller_id=store.id,
                         product_id=product.id,
                     ),
@@ -204,7 +207,7 @@ async def get_cart_checkout(user_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"cart user '{user_id}' was found",
+                    "message": f"cart user '{user.id}' was found",
                     "result": {"item": arr, "total_price": price},
                 }
             ),
@@ -216,10 +219,10 @@ async def get_cart_checkout(user_id):
 @token_required()
 async def put_cart_bill_tick():
     data = request.json
+    user = request.user
     cart_id = data.get("cart_id")
-    user_id = data.get("user_id")
     try:
-        await cart_database.update("tick", user_id=user_id, cart_id=cart_id)
+        await cart_database.update("tick", user_id=user.id, cart_id=cart_id)
     except ProductFoundError:
         return (
             jsonify(
@@ -256,12 +259,12 @@ async def put_cart_bill_tick():
 @token_required()
 async def put_cart_amount():
     data = request.json
-    user_id = data.get("user_id")
+    user = request.user
     cart_id = data.get("cart_id")
     amount = data.get("amount")
     try:
         await cart_database.update(
-            "amount", user_id=user_id, cart_id=cart_id, amount=amount
+            "amount", user_id=user.id, cart_id=cart_id, amount=amount
         )
     except (DataError, ProgrammingError):
         abort(415)
@@ -331,10 +334,10 @@ async def put_cart_amount():
 @token_required()
 async def delete_cart():
     data = request.json
-    user_id = data.get("user_id")
+    user = request.user
     cart_id = data.get("cart_id")
     try:
-        await cart_database.delete(user_id, cart_id)
+        await cart_database.delete(user.id, cart_id)
     except DataError:
         abort(415)
     except NumberMoreThan0:
@@ -372,7 +375,7 @@ async def delete_cart():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success delete cart to user '{user_id}' cart",
+                    "message": f"success delete cart to user '{user.id}' cart",
                 }
             ),
             201,
@@ -383,11 +386,11 @@ async def delete_cart():
 @token_required()
 async def add_cart():
     data = request.json
-    user_id = data.get("user_id")
+    user = request.user
     amount = data.get("amount")
     product_id = data.get("product_id")
     try:
-        await cart_database.insert(user_id, amount, product_id)
+        await cart_database.insert(user.id, amount, product_id)
     except SellerNotIsActive:
         return (
             jsonify(
@@ -435,7 +438,7 @@ async def add_cart():
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"user '{user_id}' not found",
+                    "message": f"user '{user.id}' not found",
                 }
             ),
             400,
@@ -445,7 +448,7 @@ async def add_cart():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success add product to user '{user_id}' cart",
+                    "message": f"success add product to user '{user.id}' cart",
                 }
             ),
             201,
