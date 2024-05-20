@@ -14,17 +14,16 @@ store_database = StoreCRUD()
 @checkout_router.post("/fidea/v1/product/checkout")
 @token_required()
 async def checkout_product():
-    data = request.json
-    user_id = data.get("user_id")
+    user = request.user
     try:
-        user_wallet = await wallet_database.get("user_id", user_id=user_id)
-        user_cart = await cart_database.get("cart_checkout", user_id=user_id)
+        user_wallet = await wallet_database.get("user_id", user_id=user.id)
+        user_cart = await cart_database.get("cart_checkout", user_id=user.id)
     except (UserNotFoundError, ProductFoundError):
         return (
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"cart user '{user_id}' not found",
+                    "message": f"cart user '{user.id}' not found",
                 }
             ),
             404,
@@ -72,7 +71,7 @@ async def checkout_product():
             jsonify(
                 {
                     "status_code": 201,
-                    "message": f"success purchase from cart '{user_id}'",
+                    "message": f"success purchase from cart '{user.id}'",
                 }
             ),
             201,
