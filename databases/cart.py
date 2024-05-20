@@ -7,7 +7,13 @@ from models import (
 )
 from .database import Database
 from sqlalchemy import func, and_, desc
-from utils import ProductFoundError, StockNotAvaible, UserNotIsActive, UserNotFoundError
+from utils import (
+    ProductFoundError,
+    StockNotAvaible,
+    UserNotIsActive,
+    UserNotFoundError,
+    SellerNotIsActive,
+)
 import datetime
 
 
@@ -34,6 +40,8 @@ class CartCRUD(Database):
             .first()
         ):
             cart, user, product, store = result
+            if not store.is_active:
+                raise SellerNotIsActive
             if not user.is_active:
                 raise UserNotIsActive
             if product.stock < amount:
@@ -75,18 +83,26 @@ class CartCRUD(Database):
 
     async def delete(self, user_id, cart_id):
         if result := (
-            CartDatabase.query.filter(
+            db_session.query(CartDatabase, ProductDatabase, StoreDatabase)
+            .select_from(CartDatabase)
+            .join(ProductDatabase)
+            .join(StoreDatabase)
+            .filter(
                 and_(
                     CartDatabase.user_id == user_id,
                     CartDatabase.id == cart_id,
+                    StoreDatabase.is_active == True,
                 )
             )
             .order_by(desc(CartDatabase.created_at))
             .first()
         ):
-            db_session.delete(result)
-            db_session.commit()
-            return
+            cart, product, store = result
+            if store.is_active:
+                db_session.delete(cart)
+                db_session.commit()
+                return
+            raise SellerNotIsActive
         raise ProductFoundError
 
     async def get(self, category, **kwargs):
@@ -101,7 +117,12 @@ class CartCRUD(Database):
                 .join(UserDatabase)
                 .join(ProductDatabase)
                 .join(StoreDatabase)
-                .filter(CartDatabase.user_id == user_id)
+                .filter(
+                    and_(
+                        CartDatabase.user_id == user_id,
+                        StoreDatabase.is_active == True,
+                    )
+                )
                 .order_by(desc(CartDatabase.created_at))
                 .all()
             ):
@@ -118,7 +139,11 @@ class CartCRUD(Database):
                 .join(ProductDatabase)
                 .join(StoreDatabase)
                 .filter(
-                    and_(CartDatabase.user_id == user_id, CartDatabase.mark == True)
+                    and_(
+                        CartDatabase.user_id == user_id,
+                        CartDatabase.mark == True,
+                        StoreDatabase.is_active == True,
+                    )
                 )
                 .order_by(desc(CartDatabase.created_at))
                 .all()
@@ -135,7 +160,11 @@ class CartCRUD(Database):
                 .join(ProductDatabase)
                 .join(StoreDatabase)
                 .filter(
-                    and_(CartDatabase.user_id == user_id, CartDatabase.id == cart_id)
+                    and_(
+                        CartDatabase.user_id == user_id,
+                        CartDatabase.id == cart_id,
+                        StoreDatabase.is_active == True,
+                    )
                 )
                 .order_by(desc(CartDatabase.created_at))
                 .first()
@@ -151,40 +180,72 @@ class CartCRUD(Database):
         mark = kwargs.get("mark")
         if category == "amount":
             if (
-                data := CartDatabase.query.filter(
-                    and_(CartDatabase.user_id == user_id, CartDatabase.id == cart_id)
+                cart_item := db_session.query(
+                    CartDatabase, ProductDatabase, StoreDatabase
                 )
-                .order_by(desc(CartDatabase.created_at))
-                .first()
-            ):
-                data.amount = amount
-                data.updated_at = datetime.datetime.now(
-                    datetime.timezone.utc
-                ).timestamp()
-                db_session.commit()
-            else:
-                raise ProductFoundError
-        elif category == "tick":
-            if (
-                data := CartDatabase.query.filter(
+                .select_from(CartDatabase)
+                .join(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
                     and_(
                         CartDatabase.user_id == user_id,
                         CartDatabase.id == cart_id,
+                        StoreDatabase.is_active == True,
                     )
                 )
                 .order_by(desc(CartDatabase.created_at))
                 .first()
             ):
-                data.mark = not data.mark
-                data.updated_at = datetime.datetime.now(
-                    datetime.timezone.utc
-                ).timestamp()
-                db_session.commit()
-            else:
-                raise ProductFoundError
+                cart, product, store = cart_item
+                if store.is_active:
+                    cart.amount = amount
+                    cart.updated_at = datetime.datetime.now(
+                        datetime.timezone.utc
+                    ).timestamp()
+                    db_session.commit()
+                    return
+                raise SellerNotIsActive
+            raise ProductFoundError
+        elif category == "tick":
+            if (
+                cart_item := db_session.query(
+                    CartDatabase, ProductDatabase, StoreDatabase
+                )
+                .select_from(CartDatabase)
+                .join(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
+                    and_(
+                        CartDatabase.user_id == user_id,
+                        CartDatabase.id == cart_id,
+                        StoreDatabase.is_active == True,
+                    )
+                )
+                .order_by(desc(CartDatabase.created_at))
+                .first()
+            ):
+                cart, product, store = cart_item
+                if store.is_active:
+                    cart.mark = not cart.mark
+                    cart.updated_at = datetime.datetime.now(
+                        datetime.timezone.utc
+                    ).timestamp()
+                    db_session.commit()
+                    return
+                raise SellerNotIsActive
+            raise ProductFoundError
         elif category == "all_tick":
             if (
-                data := CartDatabase.query.filter(CartDatabase.user_id == user_id)
+                data := db_session.query(CartDatabase, ProductDatabase, StoreDatabase)
+                .select_from(CartDatabase)
+                .join(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
+                    and_(
+                        CartDatabase.user_id == user_id,
+                        StoreDatabase.is_active == True,
+                    )
+                )
                 .order_by(desc(CartDatabase.created_at))
                 .all()
             ):

@@ -98,3 +98,9 @@ class UserNotIsActive(Exception):
     def __init__(self, message="user not is active"):
         self.message = message
         super().__init__(self.message)
+
+
+class SellerNotIsActive(Exception):
+    def __init__(self, message="seller not is active"):
+        self.message = message
+        super().__init__(self.message)
