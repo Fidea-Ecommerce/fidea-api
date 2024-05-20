@@ -30,13 +30,12 @@ def token_required():
                     user = await user_database.get("login", email=user_decoded["email"])
                 except:
                     abort(401)
-                else:
-                    if (
-                        user.is_active
-                        and user.unbanned_at == None
-                        and user.banned_at == None
-                    ):
-                        return await f(*args, **kwargs)
+
+                if not (
+                    user.is_active
+                    and user.unbanned_at is None
+                    and user.banned_at is None
+                ):
                     if not user.is_active or user.unbanned_at:
                         try:
                             if (
@@ -50,10 +49,12 @@ def token_required():
                                 await user_database.update(
                                     "unbanned", unbanned_at=None, email=user.email
                                 )
-                                return await f(*args, **kwargs)
                         except:
                             abort(403)
                     abort(403)
+
+                request.user = user
+                return await f(*args, **kwargs)
 
         return __token_required
 

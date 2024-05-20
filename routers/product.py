@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 from databases import ProductCRUD, FavoriteCRUD
 from utils import UserNotFoundError, UserNotSeller, token_required, ProductFoundError
 from sqlalchemy.exc import IntegrityError
@@ -12,7 +12,7 @@ favorite_database = FavoriteCRUD()
 @token_required()
 async def add_product():
     data = request.json
-    seller_id = data.get("seller_id")
+    user = request.user
     title = data.get("title")
     description = data.get("description")
     price = data.get("price")
@@ -21,7 +21,7 @@ async def add_product():
     stock = data.get("stock")
     try:
         await product_database.insert(
-            seller_id,
+            user.id,
             description,
             title,
             price,
@@ -39,22 +39,22 @@ async def add_product():
             ),
             400,
         )
-    except UserNotFoundError:
-        return (
-            jsonify(
-                {
-                    "status_code": 404,
-                    "message": f"user {seller_id!r} not found",
-                }
-            ),
-            404,
-        )
     except UserNotSeller:
         return (
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"user {seller_id!r} not seller",
+                    "message": f"user '{user.id}' not seller",
+                }
+            ),
+            400,
+        )
+    except (UserNotSeller, UserNotFoundError):
+        return (
+            jsonify(
+                {
+                    "status_code": 400,
+                    "message": f"user '{user.id}' not seller",
                 }
             ),
             400,

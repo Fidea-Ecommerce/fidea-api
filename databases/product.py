@@ -2,7 +2,12 @@ from .config import db_session, init_db
 from models import ProductDatabase, StoreDatabase, UserDatabase
 from .database import Database
 from sqlalchemy import and_, desc
-from utils import UserNotFoundError, ProductFoundError, UserNotIsActive
+from utils import (
+    UserNotFoundError,
+    ProductFoundError,
+    UserNotIsActive,
+    SellerNotIsActive,
+)
 import datetime
 
 
@@ -13,7 +18,7 @@ class ProductCRUD(Database):
 
     async def insert(
         self,
-        seller_id,
+        user_id,
         description,
         title,
         price,
@@ -26,15 +31,15 @@ class ProductCRUD(Database):
             data := db_session.query(StoreDatabase, UserDatabase)
             .select_from(StoreDatabase)
             .join(UserDatabase)
-            .filter(StoreDatabase.id == seller_id)
+            .filter(UserDatabase.id == user_id)
             .order_by(desc(StoreDatabase.created_at))
             .first()
         ):
             store, user = data
             if not store.is_active:
-                raise UserNotIsActive
+                raise SellerNotIsActive
             product = ProductDatabase(
-                seller_id,
+                store.id,
                 description,
                 title,
                 price,
