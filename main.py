@@ -1,6 +1,11 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from config import debug_mode, database_limiter_url, default_limiter
+from config import (
+    debug_mode,
+    database_limiter_url,
+    default_limiter,
+    refresh_token_limiter,
+)
 from databases import db_session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -49,7 +54,7 @@ limiter.limit(default_limiter)(register_router)
 limiter.limit(default_limiter)(wallet_router)
 limiter.limit(default_limiter)(store_router)
 limiter.limit(default_limiter)(favorite_router)
-limiter.limit("1 per 10 minute")(refresh_token_router)
+limiter.limit(refresh_token_limiter)(refresh_token_router)
 app.register_blueprint(product_router)
 app.register_blueprint(user_router)
 app.register_blueprint(cart_router)
