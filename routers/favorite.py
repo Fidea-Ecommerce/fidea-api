@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, abort
-from utils import token_required, ProductFoundError
+from utils import token_required, ProductFoundError, ProductAlready
 from databases import FavoriteCRUD
 from sqlalchemy.exc import IntegrityError, DataError
 
@@ -20,8 +20,18 @@ async def add_favorite_item():
         return (
             jsonify(
                 {
+                    "status_code": 404,
+                    "result": f"product '{product_id}' not found",
+                }
+            ),
+            404,
+        )
+    except ProductAlready:
+        return (
+            jsonify(
+                {
                     "status_code": 400,
-                    "result": f"product {product_id} already favorite item",
+                    "result": f"product '{product_id}' already favorite item",
                 }
             ),
             400,
@@ -31,7 +41,7 @@ async def add_favorite_item():
             jsonify(
                 {
                     "status_code": 201,
-                    "result": f"success add favorite to {product_id}",
+                    "result": f"success add favorite to '{product_id}'",
                 }
             ),
             201,
@@ -54,7 +64,7 @@ async def remove_favorite_item():
             jsonify(
                 {
                     "status_code": 400,
-                    "result": f"product {product_id} not found",
+                    "result": f"product '{product_id}' not found",
                 }
             ),
             400,
@@ -64,7 +74,7 @@ async def remove_favorite_item():
             jsonify(
                 {
                     "status_code": 201,
-                    "result": f"success delete favorite to {product_id}",
+                    "result": f"success delete favorite to '{product_id}'",
                 }
             ),
             201,
