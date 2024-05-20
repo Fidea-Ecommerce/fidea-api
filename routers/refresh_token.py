@@ -61,7 +61,7 @@ async def refresh_token():
         return (
             jsonify(
                 {
-                    "status_code": 200,
+                    "status_code": 201,
                     "result": {
                         "token": {
                             "access_token": access_token,
@@ -71,5 +71,5 @@ async def refresh_token():
                     "message": f"token is valid",
                 }
             ),
-            200,
+            201,
         )
