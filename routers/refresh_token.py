@@ -52,6 +52,9 @@ async def refresh_token():
                 "user_id": decoded_token["user_id"],
                 "username": decoded_token["username"],
                 "email": decoded_token["email"],
+                "is_active": decoded_token["is_active"],
+                "is_admin": decoded_token["is_admin"],
+                "is_seller": True if is_seller else False,
                 "exp": datetime.datetime.now(datetime.timezone.utc).timestamp()
                 + datetime.timedelta(days=30).total_seconds(),
             },
