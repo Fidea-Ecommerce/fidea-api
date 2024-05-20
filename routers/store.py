@@ -11,10 +11,10 @@ seller_database = StoreCRUD()
 @token_required()
 async def active_seller():
     data = request.json
-    user_id = data.get("user_id")
+    user = request.user
     store = data.get("store")
     try:
-        await seller_database.insert(user_id, store)
+        await seller_database.insert(user.id, store)
     except IntegrityError:
         return (
             jsonify(
@@ -30,7 +30,7 @@ async def active_seller():
             jsonify(
                 {
                     "status_code": 400,
-                    "message": f"user {user_id} not found",
+                    "message": f"user {user.id} not found",
                 }
             ),
             400,

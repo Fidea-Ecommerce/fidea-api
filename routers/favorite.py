@@ -11,11 +11,11 @@ favorite_database = FavoriteCRUD()
 @token_required()
 async def add_favorite_item():
     data = request.json
-    user_id = data.get("user_id")
+    user = request.user
     seller_id = data.get("seller_id")
     product_id = data.get("product_id")
     try:
-        await favorite_database.insert(user_id, seller_id, product_id)
+        await favorite_database.insert(user.id, seller_id, product_id)
     except IntegrityError:
         return (
             jsonify(
@@ -42,11 +42,11 @@ async def add_favorite_item():
 @token_required()
 async def remove_favorite_item():
     data = request.json
-    user_id = data.get("user_id")
+    user = request.user
     seller_id = data.get("seller_id")
     product_id = data.get("product_id")
     try:
-        await favorite_database.delete(user_id, seller_id, product_id)
+        await favorite_database.delete(user.id, seller_id, product_id)
     except DataError:
         abort(415)
     except ProductFoundError:

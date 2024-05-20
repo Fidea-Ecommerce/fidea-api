@@ -1,6 +1,11 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
-from config import debug_mode, database_limiter_url
+from config import (
+    debug_mode,
+    database_limiter_url,
+    default_limiter,
+    refresh_token_limiter,
+)
 from databases import db_session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -32,24 +37,24 @@ CORS(app, supports_credentials=True)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["20 per minute"],
+    default_limits=[default_limiter],
     storage_uri=database_limiter_url,
     strategy="fixed-window",
 )
 
-limiter.limit("20 per minute")(product_router)
-limiter.limit("20 per minute")(user_router)
-limiter.limit("20 per minute")(cart_router)
-limiter.limit("20 per minute")(checkout_router)
-limiter.limit("20 per minute")(reset_password_router)
-limiter.limit("20 per minute")(account_active_router)
-limiter.limit("20 per minute")(email_router)
-limiter.limit("20 per minute")(login_router)
-limiter.limit("20 per minute")(register_router)
-limiter.limit("20 per minute")(wallet_router)
-limiter.limit("20 per minute")(store_router)
-limiter.limit("20 per minute")(favorite_router)
-limiter.limit("1 per 10 minute")(favorite_router)
+limiter.limit(default_limiter)(product_router)
+limiter.limit(default_limiter)(user_router)
+limiter.limit(default_limiter)(cart_router)
+limiter.limit(default_limiter)(checkout_router)
+limiter.limit(default_limiter)(reset_password_router)
+limiter.limit(default_limiter)(account_active_router)
+limiter.limit(default_limiter)(email_router)
+limiter.limit(default_limiter)(login_router)
+limiter.limit(default_limiter)(register_router)
+limiter.limit(default_limiter)(wallet_router)
+limiter.limit(default_limiter)(store_router)
+limiter.limit(default_limiter)(favorite_router)
+limiter.limit(refresh_token_limiter)(refresh_token_router)
 app.register_blueprint(product_router)
 app.register_blueprint(user_router)
 app.register_blueprint(cart_router)
