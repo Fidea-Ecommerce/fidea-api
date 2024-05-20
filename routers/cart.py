@@ -1,17 +1,17 @@
 from flask import Blueprint, request, jsonify, abort
-from databases import CartCRUD
+from databases import CartCRUD, FavoriteCRUD
 from utils import (
     ProductFoundError,
     StockNotAvaible,
     token_required,
     NumberMoreThan0,
-    UserNotIsActive,
     UserNotFoundError,
 )
 from sqlalchemy.exc import IntegrityError, DataError, StatementError, ProgrammingError
 
 cart_router = Blueprint("api cart user", __name__)
 cart_database = CartCRUD()
+favorite_database = FavoriteCRUD()
 
 
 @cart_router.get("/fidea/v1/cart/<int:user_id>")
@@ -38,16 +38,25 @@ async def get_product(user_id):
                     "message": f"cart user '{user_id}' was found",
                     "result": [
                         {
+                            "product_id": product.id,
                             "store_id": store.id,
                             "cart_id": cart.id,
-                            "product_id": product.id,
+                            "store": store.seller,
+                            "recomendation": product.recomendation,
+                            "title": product.title,
                             "description": product.description,
                             "stock": product.stock,
-                            "amount": cart.amount,
-                            "mark": cart.mark,
-                            "title": product.title,
                             "price": product.price,
+                            "tags": product.tags,
+                            "sold": product.sold,
+                            "is_favorite": await favorite_database.get(
+                                "is_favorite",
+                                user_id=user_id,
+                                seller_id=store.id,
+                                product_id=product.id,
+                            ),
                             "image_url": product.image_url,
+                            "updated_at": product.updated_at,
                             "created_at": product.created_at,
                             "total_price": cart.amount * product.price,
                         }
@@ -83,16 +92,25 @@ async def get_product_cart_id(user_id, cart_id):
                     "status_code": 200,
                     "message": f"cart user '{user_id}' was found",
                     "result": {
+                        "product_id": product.id,
                         "store_id": store.id,
                         "cart_id": cart.id,
-                        "product_id": product.id,
+                        "store": store.seller,
+                        "recomendation": product.recomendation,
+                        "title": product.title,
                         "description": product.description,
                         "stock": product.stock,
-                        "amount": cart.amount,
-                        "mark": cart.mark,
-                        "title": product.title,
                         "price": product.price,
+                        "tags": product.tags,
+                        "sold": product.sold,
+                        "is_favorite": await favorite_database.get(
+                            "is_favorite",
+                            user_id=user_id,
+                            seller_id=store.id,
+                            product_id=product.id,
+                        ),
                         "image_url": product.image_url,
+                        "updated_at": product.updated_at,
                         "created_at": product.created_at,
                         "total_price": cart.amount * product.price,
                     },
@@ -157,16 +175,25 @@ async def get_cart_checkout(user_id):
         arr = (
             [
                 {
+                    "product_id": product.id,
                     "store_id": store.id,
                     "cart_id": cart.id,
-                    "product_id": product.id,
+                    "store": store.seller,
+                    "recomendation": product.recomendation,
+                    "title": product.title,
                     "description": product.description,
                     "stock": product.stock,
-                    "amount": cart.amount,
-                    "mark": cart.mark,
-                    "title": product.title,
                     "price": product.price,
+                    "tags": product.tags,
+                    "sold": product.sold,
+                    "is_favorite": await favorite_database.get(
+                        "is_favorite",
+                        user_id=user_id,
+                        seller_id=store.id,
+                        product_id=product.id,
+                    ),
                     "image_url": product.image_url,
+                    "updated_at": product.updated_at,
                     "created_at": product.created_at,
                 }
                 for cart, user, product, store in result
