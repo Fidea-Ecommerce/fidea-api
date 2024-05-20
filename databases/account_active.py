@@ -1,8 +1,9 @@
 from .config import db_session, init_db
 from models import AccountActiveDatabase
 from .database import Database
-from sqlalchemy import func, and_, desc
+from sqlalchemy import and_, desc
 from utils import UserNotFoundError
+import datetime
 
 
 class AccountActiveCRUD(Database):
@@ -37,14 +38,15 @@ class AccountActiveCRUD(Database):
                     and_(
                         AccountActiveDatabase.user_id == user_id,
                         AccountActiveDatabase.token == token,
+                        datetime.datetime.now(datetime.timezone.utc).timestamp()
+                        < AccountActiveDatabase.expired_at,
                     )
                 )
                 .order_by(desc(AccountActiveDatabase.created_at))
                 .first()
             ):
                 return token
-            else:
-                raise UserNotFoundError
+            raise UserNotFoundError
 
     async def update(self, category, **kwargs):
         pass
