@@ -104,6 +104,7 @@ async def get_product_by_seller(seller, seller_id, user_id):
                             "price": product.price,
                             "tags": product.tags,
                             "sold": product.sold,
+                            "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
                                 user_id=user_id,
@@ -159,6 +160,7 @@ async def get_product_id(seller, seller_id, product_id, user_id):
                         "price": product.price,
                         "tags": product.tags,
                         "sold": product.sold,
+                        "store_active": store.is_active,
                         "is_favorite": await favorite_database.get(
                             "is_favorite",
                             user_id=user_id,
@@ -208,6 +210,7 @@ async def get_title(title, user_id):
                             "price": product.price,
                             "tags": product.tags,
                             "sold": product.sold,
+                            "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
                                 user_id=user_id,
@@ -259,6 +262,7 @@ async def get_product(user_id):
                             "price": product.price,
                             "tags": product.tags,
                             "sold": product.sold,
+                            "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
                                 user_id=user_id,
