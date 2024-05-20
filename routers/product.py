@@ -71,8 +71,10 @@ async def add_product():
         )
 
 
-@product_router.get("/fidea/v1/product/<string:seller>/<int:seller_id>/<int:user_id>")
-async def get_product_by_seller(seller, seller_id, user_id):
+@product_router.get("/fidea/v1/product/<string:seller>/<int:seller_id>")
+@token_required()
+async def get_product_by_seller(seller, seller_id):
+    user = request.user
     try:
         data = await product_database.get("product", seller=seller, seller_id=seller_id)
     except ProductFoundError:
@@ -107,7 +109,7 @@ async def get_product_by_seller(seller, seller_id, user_id):
                             "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
-                                user_id=user_id,
+                                user_id=user.id,
                                 seller_id=seller_id,
                                 product_id=product.id,
                             ),
@@ -124,9 +126,11 @@ async def get_product_by_seller(seller, seller_id, user_id):
 
 
 @product_router.get(
-    "/fidea/v1/product/<string:seller>/<int:seller_id>/<int:product_id>/<int:user_id>"
+    "/fidea/v1/product/<string:seller>/<int:seller_id>/<int:product_id>"
 )
-async def get_product_id(seller, seller_id, product_id, user_id):
+@token_required()
+async def get_product_id(seller, seller_id, product_id):
+    user = request.user
     try:
         data = await product_database.get(
             "product_id", seller=seller, seller_id=seller_id, product_id=product_id
@@ -163,7 +167,7 @@ async def get_product_id(seller, seller_id, product_id, user_id):
                         "store_active": store.is_active,
                         "is_favorite": await favorite_database.get(
                             "is_favorite",
-                            user_id=user_id,
+                            user_id=user.id,
                             seller_id=seller_id,
                             product_id=product.id,
                         ),
@@ -177,8 +181,10 @@ async def get_product_id(seller, seller_id, product_id, user_id):
         )
 
 
-@product_router.get("/fidea/v1/product/search/<string:title>/<int:user_id>")
-async def get_title(title, user_id):
+@product_router.get("/fidea/v1/product/search/<string:title>")
+@token_required()
+async def get_title(title):
+    user = request.user
     try:
         data = await product_database.get("title", title=title)
     except ProductFoundError:
@@ -213,7 +219,7 @@ async def get_title(title, user_id):
                             "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
-                                user_id=user_id,
+                                user_id=user.id,
                                 seller_id=store.id,
                                 product_id=product.id,
                             ),
@@ -229,8 +235,10 @@ async def get_title(title, user_id):
         )
 
 
-@product_router.get("/fidea/v1/product/<int:user_id>")
-async def get_product(user_id):
+@product_router.get("/fidea/v1/product")
+@token_required()
+async def get_product():
+    user = request.user
     try:
         data = await product_database.get("all")
     except ProductFoundError:
@@ -265,7 +273,7 @@ async def get_product(user_id):
                             "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
-                                user_id=user_id,
+                                user_id=user.id,
                                 seller_id=store.id,
                                 product_id=product.id,
                             ),
