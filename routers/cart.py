@@ -6,6 +6,7 @@ from utils import (
     token_required,
     NumberMoreThan0,
     UserNotFoundError,
+    SellerNotIsActive,
 )
 from sqlalchemy.exc import IntegrityError, DataError, StatementError, ProgrammingError
 
@@ -229,6 +230,16 @@ async def put_cart_bill_tick():
             ),
             404,
         )
+    except SellerNotIsActive:
+        return (
+            jsonify(
+                {
+                    "status_code": 400,
+                    "message": f"store from cart id '{cart_id}' not active",
+                }
+            ),
+            400,
+        )
     else:
         return (
             jsonify(
@@ -254,6 +265,16 @@ async def put_cart_amount():
         )
     except (DataError, ProgrammingError):
         abort(415)
+    except SellerNotIsActive:
+        return (
+            jsonify(
+                {
+                    "status_code": 400,
+                    "message": f"store from cart id '{cart_id}' not active",
+                }
+            ),
+            400,
+        )
     except StockNotAvaible:
         return (
             jsonify(
@@ -326,6 +347,16 @@ async def delete_cart():
             ),
             400,
         )
+    except SellerNotIsActive:
+        return (
+            jsonify(
+                {
+                    "status_code": 400,
+                    "message": f"store from cart id '{cart_id}' not active",
+                }
+            ),
+            400,
+        )
     except ProductFoundError:
         return (
             jsonify(
@@ -357,6 +388,16 @@ async def add_cart():
     product_id = data.get("product_id")
     try:
         await cart_database.insert(user_id, amount, product_id)
+    except SellerNotIsActive:
+        return (
+            jsonify(
+                {
+                    "status_code": 400,
+                    "message": f"store from product id '{product_id}' not active",
+                }
+            ),
+            400,
+        )
     except ProductFoundError:
         return (
             jsonify(

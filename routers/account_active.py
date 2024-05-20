@@ -30,28 +30,27 @@ async def account_active(token):
                 "token", user_id=valid_token["user_id"], token=token
             )
         except UserNotFoundError:
+            await account_active_database.delete(
+                "user_id", user_id=valid_token["user_id"]
+            )
             return render_template("not_found.html")
         else:
-            if (
-                datetime.datetime.now(datetime.timezone.utc).timestamp()
-                <= user_token_database.expired_at
-            ):
-                try:
-                    await user_database.update(
-                        "is_active",
-                        is_active=True,
-                        email=valid_token["email"],
-                    )
-                except:
-                    await account_active_database.delete(
-                        "user_id", user_id=user_token_database.user_id
-                    )
-                    return render_template("not_found.html")
-                else:
-                    await account_active_database.delete(
-                        "user_id", user_id=user_token_database.user_id
-                    )
-                    return render_template("email_active.html", url=fidea_url)
+            try:
+                await user_database.update(
+                    "is_active",
+                    is_active=True,
+                    email=valid_token["email"],
+                )
+            except:
+                await account_active_database.delete(
+                    "user_id", user_id=user_token_database.user_id
+                )
+                return render_template("not_found.html")
+            else:
+                await account_active_database.delete(
+                    "user_id", user_id=user_token_database.user_id
+                )
+                return render_template("email_active.html", url=fidea_url)
     return render_template("not_found.html")
 
 

@@ -63,10 +63,13 @@ async def reset_password(token):
             confirm_password_error=confirm_password_error,
         )
     if valid_token:
-        user_token_database = await token_database.get(
-            "token", user_id=valid_token["user_id"], token=token
-        )
-        if user_token_database:
+        try:
+            user_token_database = await token_database.get(
+                "token", user_id=valid_token["user_id"], token=token
+            )
+        except:
+            await token_database.delete("user_id", user_id=valid_token["user_id"])
+        else:
             return render_template("reset_password.html")
     return render_template("not_found.html")
 

@@ -1,8 +1,9 @@
 from .config import db_session, init_db
 from models import ResetPasswordDatabase
 from .database import Database
-from sqlalchemy import func, and_, desc
+from sqlalchemy import and_, desc
 import datetime
+from utils import UserNotFoundError
 
 
 class ResetPasswordCRUD(Database):
@@ -32,7 +33,7 @@ class ResetPasswordCRUD(Database):
         user_id = kwargs.get("user_id")
         token = kwargs.get("token")
         if category == "token":
-            return (
+            if data := (
                 ResetPasswordDatabase.query.filter(
                     and_(
                         ResetPasswordDatabase.user_id == user_id,
@@ -43,7 +44,9 @@ class ResetPasswordCRUD(Database):
                 )
                 .order_by(desc(ResetPasswordDatabase.created_at))
                 .first()
-            )
+            ):
+                return data
+            raise UserNotFoundError
 
     async def update(self, category, **kwargs):
         pass
