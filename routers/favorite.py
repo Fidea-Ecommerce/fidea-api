@@ -41,7 +41,7 @@ async def add_favorite_item():
             jsonify(
                 {
                     "status_code": 201,
-                    "result": f"success add favorite to '{product_id}'",
+                    "result": f"success add favorite to product '{product_id}'",
                 }
             ),
             201,
@@ -63,19 +63,117 @@ async def remove_favorite_item():
         return (
             jsonify(
                 {
-                    "status_code": 400,
+                    "status_code": 404,
                     "result": f"product '{product_id}' not found",
                 }
             ),
-            400,
+            404,
         )
     else:
         return (
             jsonify(
                 {
                     "status_code": 201,
-                    "result": f"success delete favorite to '{product_id}'",
+                    "result": f"success delete favorite to product '{product_id}'",
                 }
             ),
             201,
+        )
+
+
+@favorite_router.get("/fidea/v1/user/favorite")
+@token_required()
+async def get_favorite_item():
+    user = request.user
+    try:
+        data = await favorite_database.get("all", user_id=user.id)
+    except ProductFoundError:
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "result": f"product not found",
+                }
+            ),
+            404,
+        )
+    else:
+        return (
+            jsonify(
+                {
+                    "status_code": 200,
+                    "message": f"data favorite user '{user.id}' was found",
+                    "result": [
+                        {
+                            "product_id": product.id,
+                            "store": store.seller,
+                            "store_id": store.id,
+                            "favorite_id": favorite.id,
+                            "recomendation": product.recomendation,
+                            "title": product.title,
+                            "description": product.description,
+                            "stock": product.stock,
+                            "price": product.price,
+                            "tags": product.tags,
+                            "sold": product.sold,
+                            "store_active": store.is_active,
+                            "is_favorite": True,
+                            "image_url": product.image_url,
+                            "updated_at": product.updated_at,
+                            "created_at": product.created_at,
+                        }
+                        for favorite, product, store in data
+                    ],
+                }
+            ),
+            200,
+        )
+
+
+@favorite_router.get("/fidea/v1/user/favorite/<int:favorite_id>")
+@token_required()
+async def get_favorite_item_id(favorite_id):
+    user = request.user
+    try:
+        data = await favorite_database.get(
+            "favorite_id", user_id=user.id, favorite_id=favorite_id
+        )
+    except ProductFoundError:
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "result": f"product not found",
+                }
+            ),
+            404,
+        )
+    else:
+        favorite, product, store = data
+        return (
+            jsonify(
+                {
+                    "status_code": 200,
+                    "message": f"data favorite user '{user.id}' was found",
+                    "result": {
+                        "product_id": product.id,
+                        "store": store.seller,
+                        "store_id": store.id,
+                        "favorite_id": favorite.id,
+                        "recomendation": product.recomendation,
+                        "title": product.title,
+                        "description": product.description,
+                        "stock": product.stock,
+                        "price": product.price,
+                        "tags": product.tags,
+                        "sold": product.sold,
+                        "store_active": store.is_active,
+                        "is_favorite": True,
+                        "image_url": product.image_url,
+                        "updated_at": product.updated_at,
+                        "created_at": product.created_at,
+                    },
+                }
+            ),
+            200,
         )
