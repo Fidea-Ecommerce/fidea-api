@@ -93,6 +93,7 @@ async def shutdown_session(exception=None):
 
 
 @app.get("/")
+@limiter.limit(default_limiter)
 async def home():
     return jsonify("welcome to ecommerce api"), 200
 
