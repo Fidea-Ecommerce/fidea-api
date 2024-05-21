@@ -1,5 +1,5 @@
 from .config import db_session, init_db
-from models import FavoriteDatabase
+from models import FavoriteDatabase, ProductDatabase, StoreDatabase
 from sqlalchemy import and_, desc
 from .database import Database
 import datetime
@@ -48,7 +48,21 @@ class FavoriteCRUD(Database):
                 .first()
             ):
                 return True
-        return False
+            return False
+        elif category == "all":
+            if (
+                data := db_session.query(
+                    FavoriteDatabase, ProductDatabase, StoreDatabase
+                )
+                .select_from(FavoriteDatabase)
+                .join(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(FavoriteDatabase.user_id == user_id)
+                .order_by(desc(FavoriteDatabase.created_at))
+                .all()
+            ):
+                return data
+            raise ProductFoundError
 
     async def update(self, category, **kwargs):
         pass
