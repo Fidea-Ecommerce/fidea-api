@@ -2,12 +2,7 @@ from .config import db_session, init_db
 from models import ProductDatabase, StoreDatabase, UserDatabase
 from .database import Database
 from sqlalchemy import and_, desc
-from utils import (
-    UserNotFoundError,
-    ProductFoundError,
-    UserNotIsActive,
-    SellerNotIsActive,
-)
+from utils import UserNotFoundError, ProductFoundError, SellerNotIsActive, Miscellaneous
 import datetime
 
 
@@ -119,11 +114,11 @@ class ProductCRUD(Database):
                 db_session.query(ProductDatabase, StoreDatabase)
                 .select_from(ProductDatabase)
                 .join(StoreDatabase)
-                .filter(ProductDatabase.title.ilike(f"%{title}%"))
                 .order_by(desc(ProductDatabase.created_at))
                 .all()
             ):
-                return product
+                result = await Miscellaneous.search_product(title, product)
+                return result
             raise ProductFoundError
         elif category == "all":
             if product := (
@@ -134,6 +129,23 @@ class ProductCRUD(Database):
                 .all()
             ):
                 return product
+            raise ProductFoundError
+        elif category == "title_product_seller":
+            if product := (
+                db_session.query(ProductDatabase, StoreDatabase)
+                .select_from(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
+                    and_(
+                        ProductDatabase.seller_id == seller_id,
+                        StoreDatabase.seller == seller,
+                    )
+                )
+                .order_by(desc(ProductDatabase.created_at))
+                .all()
+            ):
+                result = await Miscellaneous.search_product(title, product)
+                return result
             raise ProductFoundError
 
     async def update(self, category, **kwargs):

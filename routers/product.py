@@ -82,7 +82,7 @@ async def get_product_by_seller(seller, seller_id):
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"data store {seller_id!r} not found",
+                    "message": f"data store '{seller_id}' not found",
                     "result": None,
                 }
             ),
@@ -93,7 +93,7 @@ async def get_product_by_seller(seller, seller_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"data store {seller_id!r} was found",
+                    "message": f"data store '{seller_id}' was found",
                     "result": [
                         {
                             "product_id": product.id,
@@ -140,7 +140,7 @@ async def get_product_id(seller, seller_id, product_id):
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"data product {product_id} not found",
+                    "message": f"data product '{product_id}' not found",
                     "result": None,
                 }
             ),
@@ -152,7 +152,7 @@ async def get_product_id(seller, seller_id, product_id):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"data store {seller_id!r} was found",
+                    "message": f"data store '{seller_id}' was found",
                     "result": {
                         "product_id": product.id,
                         "store": store.seller,
@@ -192,7 +192,7 @@ async def get_title(title):
             jsonify(
                 {
                     "status_code": 404,
-                    "message": f"data product {title} not found",
+                    "message": f"data product {title!r} not found",
                     "result": None,
                 }
             ),
@@ -203,7 +203,65 @@ async def get_title(title):
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"data product {title} found",
+                    "message": f"data product {title!r} found",
+                    "result": [
+                        {
+                            "product_id": product.id,
+                            "store": store.seller,
+                            "store_id": store.id,
+                            "recomendation": product.recomendation,
+                            "title": product.title,
+                            "description": product.description,
+                            "stock": product.stock,
+                            "price": product.price,
+                            "tags": product.tags,
+                            "sold": product.sold,
+                            "store_active": store.is_active,
+                            "is_favorite": await favorite_database.get(
+                                "is_favorite",
+                                user_id=user.id,
+                                seller_id=store.id,
+                                product_id=product.id,
+                            ),
+                            "image_url": product.image_url,
+                            "updated_at": product.updated_at,
+                            "created_at": product.created_at,
+                        }
+                        for product, store in data
+                    ],
+                }
+            ),
+            200,
+        )
+
+
+@product_router.get(
+    "/fidea/v1/product/search/<string:seller>/<int:seller_id>/<string:title>"
+)
+@token_required()
+async def get_seller_product_title(seller, seller_id, title):
+    user = request.user
+    try:
+        data = await product_database.get(
+            "title_product_seller", title=title, seller=seller, seller_id=seller_id
+        )
+    except ProductFoundError:
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "message": f"data product {title!r} not found",
+                    "result": None,
+                }
+            ),
+            404,
+        )
+    else:
+        return (
+            jsonify(
+                {
+                    "status_code": 200,
+                    "message": f"data product {title!r} from {seller} found",
                     "result": [
                         {
                             "product_id": product.id,

@@ -1,5 +1,6 @@
 import re
 from rapidfuzz import process, fuzz
+from difflib import SequenceMatcher
 
 
 class Miscellaneous:
@@ -18,6 +19,11 @@ class Miscellaneous:
         return True
 
     @staticmethod
-    async def search_product(query, products):
-        results = process.extract(query, products, scorer=fuzz.token_sort_ratio)
-        return results
+    async def search_product(inputan, data, threshold=0.4):
+        hasil = []
+        for product, store in data:
+            judul = product.title.lower()
+            similarity_ratio = SequenceMatcher(None, inputan.lower(), judul).ratio()
+            if similarity_ratio >= threshold:
+                hasil.append((product, store))
+        return hasil
