@@ -41,7 +41,7 @@ async def add_favorite_item():
             jsonify(
                 {
                     "status_code": 201,
-                    "result": f"success add favorite to '{product_id}'",
+                    "result": f"success add favorite to product '{product_id}'",
                 }
             ),
             201,
@@ -63,18 +63,18 @@ async def remove_favorite_item():
         return (
             jsonify(
                 {
-                    "status_code": 400,
+                    "status_code": 404,
                     "result": f"product '{product_id}' not found",
                 }
             ),
-            400,
+            404,
         )
     else:
         return (
             jsonify(
                 {
                     "status_code": 201,
-                    "result": f"success delete favorite to '{product_id}'",
+                    "result": f"success delete favorite to product '{product_id}'",
                 }
             ),
             201,
@@ -102,7 +102,7 @@ async def get_favorite_item():
             jsonify(
                 {
                     "status_code": 200,
-                    "message": f"data favorite '{user.id}' was found",
+                    "message": f"data favorite user '{user.id}' was found",
                     "result": [
                         {
                             "product_id": product.id,
