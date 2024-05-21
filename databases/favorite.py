@@ -35,6 +35,7 @@ class FavoriteCRUD(Database):
         user_id = kwargs.get("user_id")
         seller_id = kwargs.get("seller_id")
         product_id = kwargs.get("product_id")
+        favorite_id = kwargs.get("favorite_id")
         if category == "is_favorite":
             if (
                 data := FavoriteDatabase.query.filter(
@@ -60,6 +61,25 @@ class FavoriteCRUD(Database):
                 .filter(FavoriteDatabase.user_id == user_id)
                 .order_by(desc(FavoriteDatabase.created_at))
                 .all()
+            ):
+                return data
+            raise ProductFoundError
+        elif category == "favorite_id":
+            if (
+                data := db_session.query(
+                    FavoriteDatabase, ProductDatabase, StoreDatabase
+                )
+                .select_from(FavoriteDatabase)
+                .join(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
+                    and_(
+                        FavoriteDatabase.user_id == user_id,
+                        FavoriteDatabase.id == favorite_id,
+                    )
+                )
+                .order_by(desc(FavoriteDatabase.created_at))
+                .first()
             ):
                 return data
             raise ProductFoundError

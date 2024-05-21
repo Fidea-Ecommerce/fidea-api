@@ -108,6 +108,7 @@ async def get_favorite_item():
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
+                            "favorite_id": favorite.id,
                             "recomendation": product.recomendation,
                             "title": product.title,
                             "description": product.description,
