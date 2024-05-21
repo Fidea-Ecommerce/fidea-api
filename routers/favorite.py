@@ -128,3 +128,52 @@ async def get_favorite_item():
             ),
             200,
         )
+
+
+@favorite_router.get("/fidea/v1/user/favorite/<int:favorite_id>")
+@token_required()
+async def get_favorite_item_id(favorite_id):
+    user = request.user
+    try:
+        data = await favorite_database.get(
+            "favorite_id", user_id=user.id, favorite_id=favorite_id
+        )
+    except ProductFoundError:
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "result": f"product not found",
+                }
+            ),
+            404,
+        )
+    else:
+        favorite, product, store = data
+        return (
+            jsonify(
+                {
+                    "status_code": 200,
+                    "message": f"data favorite user '{user.id}' was found",
+                    "result": {
+                        "product_id": product.id,
+                        "store": store.seller,
+                        "store_id": store.id,
+                        "favorite_id": favorite.id,
+                        "recomendation": product.recomendation,
+                        "title": product.title,
+                        "description": product.description,
+                        "stock": product.stock,
+                        "price": product.price,
+                        "tags": product.tags,
+                        "sold": product.sold,
+                        "store_active": store.is_active,
+                        "is_favorite": True,
+                        "image_url": product.image_url,
+                        "updated_at": product.updated_at,
+                        "created_at": product.created_at,
+                    },
+                }
+            ),
+            200,
+        )
