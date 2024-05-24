@@ -181,6 +181,60 @@ async def get_product_id(seller, seller_id, product_id):
         )
 
 
+@product_router.get("/fidea/v1/product/<string:seller>/<int:seller_id>/<string:title>")
+@token_required()
+async def get_product_title(seller, seller_id, title):
+    user = request.user
+    try:
+        data = await product_database.get(
+            "title_first_index", seller=seller, seller_id=seller_id, title=title
+        )
+    except ProductFoundError:
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "message": f"data product '{title}' not found",
+                    "result": None,
+                }
+            ),
+            404,
+        )
+    else:
+        product, store = data
+        return (
+            jsonify(
+                {
+                    "status_code": 200,
+                    "message": f"data store '{seller_id}' was found",
+                    "result": {
+                        "product_id": product.id,
+                        "store": store.seller,
+                        "store_id": store.id,
+                        "recomendation": product.recomendation,
+                        "title": product.title,
+                        "description": product.description,
+                        "stock": product.stock,
+                        "price": product.price,
+                        "tags": product.tags,
+                        "sold": product.sold,
+                        "store_active": store.is_active,
+                        "is_favorite": await favorite_database.get(
+                            "is_favorite",
+                            user_id=user.id,
+                            seller_id=seller_id,
+                            product_id=product.id,
+                        ),
+                        "image_url": product.image_url,
+                        "updated_at": product.updated_at,
+                        "created_at": product.created_at,
+                    },
+                }
+            ),
+            200,
+        )
+
+
 @product_router.get("/fidea/v1/product/search/<string:title>")
 @token_required()
 async def get_title(title):

@@ -120,6 +120,23 @@ class ProductCRUD(Database):
                 result = await Miscellaneous.search_product(title, product)
                 return result
             raise ProductFoundError
+        elif category == "title_first_index":
+            if product := (
+                db_session.query(ProductDatabase, StoreDatabase)
+                .select_from(ProductDatabase)
+                .join(StoreDatabase)
+                .filter(
+                    and_(
+                        ProductDatabase.seller_id == seller_id,
+                        StoreDatabase.seller == seller,
+                        ProductDatabase.title == title,
+                    )
+                )
+                .order_by(desc(ProductDatabase.created_at))
+                .first()
+            ):
+                return product
+            raise ProductFoundError
         elif category == "all":
             if product := (
                 db_session.query(ProductDatabase, StoreDatabase)
