@@ -5,6 +5,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     CheckConstraint,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import registry
 from databases import metadata, db_session
@@ -54,7 +55,6 @@ favorite_table = Table(
         Integer,
         ForeignKey("product.id", ondelete="CASCADE"),
         nullable=False,
-        unique=True,
     ),
     Column("created_at", Float, nullable=False),
     Column("updated_at", Float, nullable=False),
