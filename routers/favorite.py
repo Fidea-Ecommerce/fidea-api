@@ -1,10 +1,11 @@
 from flask import Blueprint, jsonify, request, abort
 from utils import token_required, ProductFoundError, ProductAlready
-from databases import FavoriteCRUD
+from databases import FavoriteCRUD, CartCRUD
 from sqlalchemy.exc import IntegrityError, DataError
 
 favorite_router = Blueprint("api favorite item", __name__)
 favorite_database = FavoriteCRUD()
+cart_database = CartCRUD()
 
 
 @favorite_router.post("/fidea/v1/user/favorite")
@@ -107,6 +108,9 @@ async def get_favorite_item():
                     "message": f"data favorite user '{user.id}' was found",
                     "result": [
                         {
+                            "amount": await cart_database.get(
+                                "cart_amount", user_id=user.id, product_id=product.id
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -165,6 +169,9 @@ async def get_favorite_item_id(favorite_id):
                     "status_code": 200,
                     "message": f"data favorite user '{user.id}' was found",
                     "result": {
+                        "amount": await cart_database.get(
+                            "cart_amount", user_id=user.id, product_id=product.id
+                        ),
                         "product_id": product.id,
                         "store": store.seller,
                         "store_id": store.id,

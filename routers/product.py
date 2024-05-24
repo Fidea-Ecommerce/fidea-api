@@ -1,11 +1,12 @@
-from flask import Blueprint, request, jsonify, abort
-from databases import ProductCRUD, FavoriteCRUD
+from flask import Blueprint, request, jsonify
+from databases import ProductCRUD, FavoriteCRUD, CartCRUD
 from utils import UserNotFoundError, UserNotSeller, token_required, ProductFoundError
 from sqlalchemy.exc import IntegrityError
 
 product_router = Blueprint("api ecommerce product", __name__)
 product_database = ProductCRUD()
 favorite_database = FavoriteCRUD()
+cart_database = CartCRUD()
 
 
 @product_router.post("/fidea/v1/product")
@@ -96,6 +97,9 @@ async def get_product_by_seller(seller, seller_id):
                     "message": f"data store '{seller_id}' was found",
                     "result": [
                         {
+                            "amount": await cart_database.get(
+                                "cart_amount", user_id=user.id, product_id=product.id
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -160,6 +164,9 @@ async def get_product_id(seller, seller_id, product_id):
                     "status_code": 200,
                     "message": f"data store '{seller_id}' was found",
                     "result": {
+                        "amount": await cart_database.get(
+                            "cart_amount", user_id=user.id, product_id=product.id
+                        ),
                         "product_id": product.id,
                         "store": store.seller,
                         "store_id": store.id,
@@ -220,6 +227,9 @@ async def get_product_title(seller, seller_id, title):
                     "status_code": 200,
                     "message": f"data store '{seller_id}' was found",
                     "result": {
+                        "amount": await cart_database.get(
+                            "cart_amount", user_id=user.id, product_id=product.id
+                        ),
                         "product_id": product.id,
                         "store": store.seller,
                         "store_id": store.id,
@@ -278,6 +288,9 @@ async def get_title(title):
                     "message": f"data product {title!r} found",
                     "result": [
                         {
+                            "amount": await cart_database.get(
+                                "cart_amount", user_id=user.id, product_id=product.id
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -342,6 +355,9 @@ async def get_seller_product_title(seller, seller_id, title):
                     "message": f"data product {title!r} from {seller} found",
                     "result": [
                         {
+                            "amount": await cart_database.get(
+                                "cart_amount", user_id=user.id, product_id=product.id
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -396,6 +412,9 @@ async def get_product():
                     "message": f"data product found",
                     "result": [
                         {
+                            "amount": await cart_database.get(
+                                "cart_amount", user_id=user.id, product_id=product.id
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,

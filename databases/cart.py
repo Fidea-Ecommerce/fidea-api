@@ -108,6 +108,7 @@ class CartCRUD(Database):
     async def get(self, category, **kwargs):
         user_id = kwargs.get("user_id")
         cart_id = kwargs.get("cart_id")
+        product_id = kwargs.get("product_id")
         if category == "cart":
             if (
                 cart_item := db_session.query(
@@ -172,6 +173,19 @@ class CartCRUD(Database):
                 return cart_item
             else:
                 raise ProductFoundError
+        elif category == "cart_amount":
+            if (
+                data := CartDatabase.query.filter(
+                    and_(
+                        CartDatabase.user_id == user_id,
+                        CartDatabase.product_id == product_id,
+                    )
+                )
+                .order_by(desc(CartDatabase.created_at))
+                .first()
+            ):
+                return data.amount
+            return None
 
     async def update(self, category, **kwargs):
         user_id = kwargs.get("user_id")
