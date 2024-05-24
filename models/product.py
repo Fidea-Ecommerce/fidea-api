@@ -8,6 +8,7 @@ from sqlalchemy import (
     Boolean,
     ARRAY,
     CheckConstraint,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import registry, relationship
 from databases import metadata, db_session
@@ -55,7 +56,7 @@ product_table = Table(
         nullable=False,
     ),
     Column("description", String, nullable=False),
-    Column("title", String, nullable=False, unique=True),
+    Column("title", String, nullable=False),
     Column("price", Float, nullable=False),
     Column("tags", ARRAY(String), nullable=False),
     Column("image_url", String, nullable=False),
@@ -70,6 +71,7 @@ product_table = Table(
     CheckConstraint("created_at >= 0", name="positive_created_at"),
     CheckConstraint("updated_at >= 0", name="positive_updated_at"),
     CheckConstraint("sold >= 0", name="positive_sold"),
+    UniqueConstraint("seller_id", "title", name="uix_seller_id_title"),
 )
 
 mapper_registry.map_imperatively(ProductDatabase, product_table)
