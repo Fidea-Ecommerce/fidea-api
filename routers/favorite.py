@@ -111,6 +111,11 @@ async def get_favorite_item():
                             "amount": await cart_database.get(
                                 "cart_amount", user_id=user.id, product_id=product.id
                             ),
+                            "cart_id": await cart_database.get(
+                                "product_cart_id",
+                                user_id=user.id,
+                                product_id=product.id,
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -171,6 +176,11 @@ async def get_favorite_item_id(favorite_id):
                     "result": {
                         "amount": await cart_database.get(
                             "cart_amount", user_id=user.id, product_id=product.id
+                        ),
+                        "cart_id": await cart_database.get(
+                            "product_cart_id",
+                            user_id=user.id,
+                            product_id=product.id,
                         ),
                         "product_id": product.id,
                         "store": store.seller,
