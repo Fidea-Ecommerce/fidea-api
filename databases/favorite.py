@@ -50,6 +50,20 @@ class FavoriteCRUD(Database):
             ):
                 return True
             return False
+        elif category == "favorite_id":
+            if (
+                data := FavoriteDatabase.query.filter(
+                    and_(
+                        FavoriteDatabase.user_id == user_id,
+                        FavoriteDatabase.seller_id == seller_id,
+                        FavoriteDatabase.product_id == product_id,
+                    )
+                )
+                .order_by(desc(FavoriteDatabase.created_at))
+                .first()
+            ):
+                return data.id
+            return None
         elif category == "all":
             if (
                 data := db_session.query(

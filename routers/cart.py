@@ -41,9 +41,9 @@ async def get_product():
                     "result": [
                         {
                             "product_id": product.id,
+                            "store": store.seller,
                             "store_id": store.id,
                             "cart_id": cart.id,
-                            "store": store.seller,
                             "recomendation": product.recomendation,
                             "title": product.title,
                             "description": product.description,
@@ -51,8 +51,15 @@ async def get_product():
                             "price": product.price,
                             "tags": product.tags,
                             "sold": product.sold,
+                            "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
+                                user_id=user.id,
+                                seller_id=store.id,
+                                product_id=product.id,
+                            ),
+                            "favorite_id": await favorite_database.get(
+                                "favorite_id",
                                 user_id=user.id,
                                 seller_id=store.id,
                                 product_id=product.id,
@@ -96,9 +103,9 @@ async def get_product_cart_id(cart_id):
                     "message": f"cart user '{user.id}' was found",
                     "result": {
                         "product_id": product.id,
+                        "store": store.seller,
                         "store_id": store.id,
                         "cart_id": cart.id,
-                        "store": store.seller,
                         "recomendation": product.recomendation,
                         "title": product.title,
                         "description": product.description,
@@ -106,8 +113,15 @@ async def get_product_cart_id(cart_id):
                         "price": product.price,
                         "tags": product.tags,
                         "sold": product.sold,
+                        "store_active": store.is_active,
                         "is_favorite": await favorite_database.get(
                             "is_favorite",
+                            user_id=user.id,
+                            seller_id=store.id,
+                            product_id=product.id,
+                        ),
+                        "favorite_id": await favorite_database.get(
+                            "favorite_id",
                             user_id=user.id,
                             seller_id=store.id,
                             product_id=product.id,
@@ -180,9 +194,9 @@ async def get_cart_checkout():
             [
                 {
                     "product_id": product.id,
+                    "store": store.seller,
                     "store_id": store.id,
                     "cart_id": cart.id,
-                    "store": store.seller,
                     "recomendation": product.recomendation,
                     "title": product.title,
                     "description": product.description,
@@ -190,8 +204,15 @@ async def get_cart_checkout():
                     "price": product.price,
                     "tags": product.tags,
                     "sold": product.sold,
+                    "store_active": store.is_active,
                     "is_favorite": await favorite_database.get(
                         "is_favorite",
+                        user_id=user.id,
+                        seller_id=store.id,
+                        product_id=product.id,
+                    ),
+                    "favorite_id": await favorite_database.get(
+                        "favorite_id",
                         user_id=user.id,
                         seller_id=store.id,
                         product_id=product.id,
