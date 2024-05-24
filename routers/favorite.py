@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, abort
-from utils import token_required, ProductFoundError, ProductAlready
+from utils import token_required, ProductFoundError
 from databases import FavoriteCRUD
 from sqlalchemy.exc import IntegrityError, DataError
 
@@ -16,17 +16,9 @@ async def add_favorite_item():
     product_id = data.get("product_id")
     try:
         await favorite_database.insert(user.id, seller_id, product_id)
+    except DataError:
+        abort(415)
     except IntegrityError:
-        return (
-            jsonify(
-                {
-                    "status_code": 404,
-                    "result": f"product '{product_id}' not found",
-                }
-            ),
-            404,
-        )
-    except ProductAlready:
         return (
             jsonify(
                 {
@@ -35,6 +27,16 @@ async def add_favorite_item():
                 }
             ),
             400,
+        )
+    except ProductFoundError:
+        return (
+            jsonify(
+                {
+                    "status_code": 404,
+                    "result": f"product '{product_id}' not found",
+                }
+            ),
+            404,
         )
     else:
         return (
