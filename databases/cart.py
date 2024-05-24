@@ -186,6 +186,19 @@ class CartCRUD(Database):
             ):
                 return data.amount
             return None
+        elif category == "product_cart_id":
+            if (
+                data := CartDatabase.query.filter(
+                    and_(
+                        CartDatabase.user_id == user_id,
+                        CartDatabase.product_id == product_id,
+                    )
+                )
+                .order_by(desc(CartDatabase.created_at))
+                .first()
+            ):
+                return data.id
+            return None
 
     async def update(self, category, **kwargs):
         user_id = kwargs.get("user_id")

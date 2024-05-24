@@ -100,6 +100,11 @@ async def get_product_by_seller(seller, seller_id):
                             "amount": await cart_database.get(
                                 "cart_amount", user_id=user.id, product_id=product.id
                             ),
+                            "cart_id": await cart_database.get(
+                                "product_cart_id",
+                                user_id=user.id,
+                                product_id=product.id,
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -167,6 +172,11 @@ async def get_product_id(seller, seller_id, product_id):
                         "amount": await cart_database.get(
                             "cart_amount", user_id=user.id, product_id=product.id
                         ),
+                        "cart_id": await cart_database.get(
+                            "product_cart_id",
+                            user_id=user.id,
+                            product_id=product.id,
+                        ),
                         "product_id": product.id,
                         "store": store.seller,
                         "store_id": store.id,
@@ -230,6 +240,11 @@ async def get_product_title(seller, seller_id, title):
                         "amount": await cart_database.get(
                             "cart_amount", user_id=user.id, product_id=product.id
                         ),
+                        "cart_id": await cart_database.get(
+                            "product_cart_id",
+                            user_id=user.id,
+                            product_id=product.id,
+                        ),
                         "product_id": product.id,
                         "store": store.seller,
                         "store_id": store.id,
@@ -290,6 +305,11 @@ async def get_title(title):
                         {
                             "amount": await cart_database.get(
                                 "cart_amount", user_id=user.id, product_id=product.id
+                            ),
+                            "cart_id": await cart_database.get(
+                                "product_cart_id",
+                                user_id=user.id,
+                                product_id=product.id,
                             ),
                             "product_id": product.id,
                             "store": store.seller,
@@ -358,6 +378,11 @@ async def get_seller_product_title(seller, seller_id, title):
                             "amount": await cart_database.get(
                                 "cart_amount", user_id=user.id, product_id=product.id
                             ),
+                            "cart_id": await cart_database.get(
+                                "product_cart_id",
+                                user_id=user.id,
+                                product_id=product.id,
+                            ),
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -414,6 +439,11 @@ async def get_product():
                         {
                             "amount": await cart_database.get(
                                 "cart_amount", user_id=user.id, product_id=product.id
+                            ),
+                            "cart_id": await cart_database.get(
+                                "product_cart_id",
+                                user_id=user.id,
+                                product_id=product.id,
                             ),
                             "product_id": product.id,
                             "store": store.seller,

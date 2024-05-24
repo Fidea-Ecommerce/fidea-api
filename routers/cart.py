@@ -41,6 +41,7 @@ async def get_product():
                     "result": [
                         {
                             "amount": cart.amount,
+                            "cart_id": cart.id,
                             "product_id": product.id,
                             "store": store.seller,
                             "store_id": store.id,
@@ -104,6 +105,7 @@ async def get_product_cart_id(cart_id):
                     "message": f"cart user '{user.id}' was found",
                     "result": {
                         "amount": cart.amount,
+                        "cart_id": cart.id,
                         "product_id": product.id,
                         "store": store.seller,
                         "store_id": store.id,
@@ -196,6 +198,7 @@ async def get_cart_checkout():
             [
                 {
                     "amount": cart.amount,
+                    "cart_id": cart.id,
                     "product_id": product.id,
                     "store": store.seller,
                     "store_id": store.id,
