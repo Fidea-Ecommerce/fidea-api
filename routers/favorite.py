@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, abort
-from utils import token_required, ProductFoundError
+from utils import token_required, ProductFoundError, ProductAlready
 from databases import FavoriteCRUD
 from sqlalchemy.exc import IntegrityError, DataError
 
@@ -18,7 +18,7 @@ async def add_favorite_item():
         await favorite_database.insert(user.id, seller_id, product_id)
     except DataError:
         abort(415)
-    except IntegrityError:
+    except ProductAlready:
         return (
             jsonify(
                 {
@@ -28,7 +28,7 @@ async def add_favorite_item():
             ),
             400,
         )
-    except ProductFoundError:
+    except IntegrityError:
         return (
             jsonify(
                 {
@@ -119,6 +119,13 @@ async def get_favorite_item():
                             "tags": product.tags,
                             "sold": product.sold,
                             "store_active": store.is_active,
+                            "is_favorite": await favorite_database.get(
+                                "is_favorite",
+                                user_id=user.id,
+                                seller_id=store.id,
+                                product_id=product.id,
+                            ),
+                            "favorite_id": favorite.id,
                             "is_favorite": True,
                             "image_url": product.image_url,
                             "updated_at": product.updated_at,
@@ -161,7 +168,6 @@ async def get_favorite_item_id(favorite_id):
                         "product_id": product.id,
                         "store": store.seller,
                         "store_id": store.id,
-                        "favorite_id": favorite.id,
                         "recomendation": product.recomendation,
                         "title": product.title,
                         "description": product.description,
@@ -170,7 +176,13 @@ async def get_favorite_item_id(favorite_id):
                         "tags": product.tags,
                         "sold": product.sold,
                         "store_active": store.is_active,
-                        "is_favorite": True,
+                        "is_favorite": await favorite_database.get(
+                            "is_favorite",
+                            user_id=user.id,
+                            seller_id=store.id,
+                            product_id=product.id,
+                        ),
+                        "favorite_id": favorite.id,
                         "image_url": product.image_url,
                         "updated_at": product.updated_at,
                         "created_at": product.created_at,

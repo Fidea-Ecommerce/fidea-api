@@ -110,7 +110,13 @@ async def get_product_by_seller(seller, seller_id):
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
                                 user_id=user.id,
-                                seller_id=seller_id,
+                                seller_id=store.id,
+                                product_id=product.id,
+                            ),
+                            "favorite_id": await favorite_database.get(
+                                "favorite_id",
+                                user_id=user.id,
+                                seller_id=store.id,
                                 product_id=product.id,
                             ),
                             "image_url": product.image_url,
@@ -168,7 +174,13 @@ async def get_product_id(seller, seller_id, product_id):
                         "is_favorite": await favorite_database.get(
                             "is_favorite",
                             user_id=user.id,
-                            seller_id=seller_id,
+                            seller_id=store.id,
+                            product_id=product.id,
+                        ),
+                        "favorite_id": await favorite_database.get(
+                            "favorite_id",
+                            user_id=user.id,
+                            seller_id=store.id,
                             product_id=product.id,
                         ),
                         "image_url": product.image_url,
@@ -225,6 +237,12 @@ async def get_product_title(seller, seller_id, title):
                             seller_id=seller_id,
                             product_id=product.id,
                         ),
+                        "favorite_id": await favorite_database.get(
+                            "favorite_id",
+                            user_id=user.id,
+                            seller_id=seller_id,
+                            product_id=product.id,
+                        ),
                         "image_url": product.image_url,
                         "updated_at": product.updated_at,
                         "created_at": product.created_at,
@@ -273,6 +291,12 @@ async def get_title(title):
                             "store_active": store.is_active,
                             "is_favorite": await favorite_database.get(
                                 "is_favorite",
+                                user_id=user.id,
+                                seller_id=store.id,
+                                product_id=product.id,
+                            ),
+                            "favorite_id": await favorite_database.get(
+                                "favorite_id",
                                 user_id=user.id,
                                 seller_id=store.id,
                                 product_id=product.id,
