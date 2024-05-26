@@ -62,6 +62,18 @@ async def login():
                 refresh_token_key,
                 algorithm=algorithm,
             )
+            mobile_token = jwt.encode(
+                {
+                    "user_id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "is_active": user.is_active,
+                    "is_admin": user.is_admin,
+                    "is_seller": True if is_seller else False,
+                },
+                access_token_key,
+                algorithm=algorithm,
+            )
             return (
                 jsonify(
                     {
@@ -70,6 +82,7 @@ async def login():
                             "token": {
                                 "access_token": access_token,
                                 "refresh_token": refresh_token,
+                                "mobile_token": mobile_token,
                             }
                         },
                         "message": f"user {email!r} was found",
