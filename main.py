@@ -93,7 +93,7 @@ async def shutdown_session(exception=None):
 
 @app.teardown_request
 async def checkin_db(exc):
-    user_store.db_session.remove()
+    db_session.db_session.remove()
 
 
 @app.get("/")
