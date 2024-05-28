@@ -38,12 +38,12 @@ async def login():
             wallet_active = False
             wallet = 0
             try:
-                wallet = await wallet_database.get("user_id", user_id=user.id)
+                wallet_user = await wallet_database.get("user_id", user_id=user.id)
             except UserNotFoundError:
                 pass
             else:
                 wallet_active = True
-                wallet += wallet.amount
+                wallet += wallet_user.amount
             access_token = jwt.encode(
                 {
                     "user_id": user.id,
