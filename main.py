@@ -91,6 +91,10 @@ async def add_cors_headers(response):
 async def shutdown_session(exception=None):
     db_session.remove()
 
+@app.teardown_request
+async def checkin_db(exc):
+    db_session.remove()
+
 
 @app.get("/")
 @limiter.limit(default_limiter)

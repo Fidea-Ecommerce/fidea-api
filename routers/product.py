@@ -141,7 +141,7 @@ async def get_product_by_seller(seller, seller_id):
 
 
 @product_router.get(
-    "/fidea/v1/product/<string:seller>/<int:seller_id>/<int:product_id>"
+    "/fidea/v1/product/id/<string:seller>/<int:seller_id>/<int:product_id>"
 )
 @token_required()
 async def get_product_id(seller, seller_id, product_id):
@@ -210,7 +210,7 @@ async def get_product_id(seller, seller_id, product_id):
         )
 
 
-@product_router.get("/fidea/v1/product/<string:seller>/<int:seller_id>/<string:title>")
+@product_router.get("/fidea/v1/product/title/<string:seller>/<int:seller_id>/<string:title>")
 @token_required()
 async def get_product_title(seller, seller_id, title):
     user = request.user
