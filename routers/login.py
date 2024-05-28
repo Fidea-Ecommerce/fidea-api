@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_bcrypt import Bcrypt
-from databases import UserCRUD, StoreCRUD
+from databases import UserCRUD, StoreCRUD, WalletCRUD
 from utils import UserNotFoundError
 from config import access_token_key, algorithm, refresh_token_key
 import jwt
@@ -10,6 +10,7 @@ login_router = Blueprint("api user login", __name__)
 bcrypt = Bcrypt()
 user_database = UserCRUD()
 seller_database = StoreCRUD()
+wallet_database = WalletCRUD()
 
 
 @login_router.post("/fidea/v1/user/login")
@@ -34,6 +35,11 @@ async def login():
     else:
         if bcrypt.check_password_hash(user.password, password):
             is_seller = await seller_database.get("is_seller", user_id=user.id)
+            wallet_active = False
+            wallet = 0
+            if wallet_user := await wallet_database.get("user_id", user_id=user.id):
+                wallet_active = True
+                wallet += wallet_user.amount
             access_token = jwt.encode(
                 {
                     "user_id": user.id,
@@ -42,6 +48,8 @@ async def login():
                     "is_active": user.is_active,
                     "is_admin": user.is_admin,
                     "is_seller": True if is_seller else False,
+                    "wallet_active": wallet_active,
+                    "amount": wallet,
                     "exp": datetime.datetime.now(datetime.timezone.utc).timestamp()
                     + datetime.timedelta(minutes=5).total_seconds(),
                 },
@@ -56,6 +64,8 @@ async def login():
                     "is_active": user.is_active,
                     "is_admin": user.is_admin,
                     "is_seller": True if is_seller else False,
+                    "wallet_active": wallet_active,
+                    "amount": wallet,
                     "exp": datetime.datetime.now(datetime.timezone.utc).timestamp()
                     + datetime.timedelta(days=30).total_seconds(),
                 },
@@ -70,6 +80,8 @@ async def login():
                     "is_active": user.is_active,
                     "is_admin": user.is_admin,
                     "is_seller": True if is_seller else False,
+                    "wallet_active": wallet_active,
+                    "amount": wallet,
                 },
                 access_token_key,
                 algorithm=algorithm,
